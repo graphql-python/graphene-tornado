@@ -1,5 +1,4 @@
 from setuptools import find_packages, setup
-import sys
 import ast
 import re
 
@@ -10,10 +9,9 @@ with open('graphene_tornado/__init__.py', 'rb') as f:
         f.read().decode('utf-8')).group(1)))
 
 tests_require = [
-    'coveralls',
     'mock',
-    'PyHamcrest',
-    'pytz',
+    'pytest',
+    'pytest-tornado'
 ]
 
 setup(
@@ -49,13 +47,13 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
-        'graphene>=2.0.dev',
+        'graphene>=2.0.1',
         'Jinja2==2.9.6',
         'tornado>=4.2',
         'werkzeug==0.12.2'
     ],
     setup_requires=[
-        'nose',
+        'pytest',
     ],
     tests_require=tests_require,
     extras_require={

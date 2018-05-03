@@ -1,68 +1,83 @@
-from hamcrest import assert_that, contains_string, equal_to
-from tornado.testing import gen_test
+import pytest
 
-from graphene_tornado.tests.base_test_case import BaseTestCase
+from examples.example import ExampleApplication
+from graphene_tornado.tests.http_helper import HttpHelper
 
 
 class Unset(object):
     pass
 
 
-class TestGraphiQL(BaseTestCase):
+@pytest.fixture
+def app():
+    return ExampleApplication()
 
-    @gen_test
-    def test_displays_graphiql_with_direct_route(self):
-        res = yield self.get('/graphql/graphiql', headers={'Accept': 'text/html'})
-        self.has_graphiql(res)
 
-    @gen_test
-    def test_displays_graphiql_with_accept_html(self):
-        res = yield self.get('/graphql/graphiql', headers={'Accept': 'text/html'})
-        self.has_graphiql(res)
+@pytest.fixture
+def http_helper(http_client, base_url):
+    return HttpHelper(http_client, base_url)
 
-    @gen_test
-    def test_graphiql_is_enabled(self):
-        res = yield self.get('/graphql', headers={'Accept': 'text/html'})
-        self.has_graphiql(res)
 
-    @gen_test
-    def test_graphiql_default_title(self):
-        res = yield self.get('/graphql', headers={'Accept': 'text/html'})
-        assert_that(res.body, contains_string('<title>GraphiQL</title>'))
+@pytest.mark.gen_test
+def test_displays_graphiql_with_direct_route(http_helper):
+    res = yield http_helper.get('/graphql/graphiql', headers={'Accept': 'text/html'})
+    has_graphiql(res)
 
-    @gen_test
-    def test_graphiql_renders_pretty(self):
-        response = yield self.get('/graphql?query={test}', headers={'Accept': 'text/html'})
-        pretty_response = (
-            '{\n'
-            '  "data": {\n'
-            '    "test": "Hello World"\n'
-            '  }\n'
-            '}'
-        ).replace("\"", "\\\"").replace("\n", "\\n")
-        assert_that(response.body, contains_string(pretty_response))
 
-    @gen_test
-    def test_graphiql_renders_pretty(self):
-        response = yield self.get('/graphql?query={test}', headers={'Accept': 'text/html'})
-        pretty_response = (
-            '{\n'
-            '  "data": {\n'
-            '    "test": "Hello World"\n'
-            '  }\n'
-            '}'
-        ).replace("\"", "\\\"").replace("\n", "\\n")
-        assert_that(response.body, contains_string(pretty_response))
+@pytest.mark.gen_test
+def test_displays_graphiql_with_accept_html(http_helper):
+    res = yield http_helper.get('/graphql/graphiql', headers={'Accept': 'text/html'})
+    has_graphiql(res)
 
-    @gen_test
-    def test_handles_empty_vars(self):
-        response = yield self.post_json('/graphql', headers={'Accept': 'text/html'}, post_data=dict(
-            query="",
-            variables=None,
-            operationName=""
-        ))
-        self.has_graphiql(response)
 
-    def has_graphiql(self, response):
-        assert_that(response.body, contains_string("ReactDOM"))
-        assert_that(response.code, equal_to(200))
+@pytest.mark.gen_test
+def test_graphiql_is_enabled(http_helper):
+    res = yield http_helper.get('/graphql', headers={'Accept': 'text/html'})
+    has_graphiql(res)
+
+
+@pytest.mark.gen_test
+def test_graphiql_default_title(http_helper):
+    res = yield http_helper.get('/graphql', headers={'Accept': 'text/html'})
+    assert '<title>GraphiQL</title>' in res.body
+
+
+@pytest.mark.gen_test
+def test_graphiql_renders_pretty(http_helper):
+    response = yield http_helper.get('/graphql?query={test}', headers={'Accept': 'text/html'})
+    pretty_response = (
+        '{\n'
+        '  "data": {\n'
+        '    "test": "Hello World"\n'
+        '  }\n'
+        '}'
+    ).replace("\"", "\\\"").replace("\n", "\\n")
+    assert pretty_response in response.body
+
+
+@pytest.mark.gen_test
+def test_graphiql_renders_pretty(http_helper):
+    response = yield http_helper.get('/graphql?query={test}', headers={'Accept': 'text/html'})
+    pretty_response = (
+        '{\n'
+        '  "data": {\n'
+        '    "test": "Hello World"\n'
+        '  }\n'
+        '}'
+    ).replace("\"", "\\\"").replace("\n", "\\n")
+    assert pretty_response in response.body
+
+
+@pytest.mark.gen_test
+def test_handles_empty_vars(http_helper):
+    response = yield http_helper.post_json('/graphql', headers={'Accept': 'text/html'}, post_data=dict(
+        query="",
+        variables=None,
+        operationName=""
+    ))
+    has_graphiql(response)
+
+
+def has_graphiql(response):
+    assert "ReactDOM" in response.body
+    assert response.code == 200

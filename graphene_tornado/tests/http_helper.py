@@ -1,20 +1,12 @@
 import json
 import urllib
 
-from tornado.testing import AsyncHTTPTestCase
 
-from examples.example import ExampleApplication
+class HttpHelper:
 
-
-class BaseTestCase(AsyncHTTPTestCase):
-
-    def get_app(self):
-        self.app = ExampleApplication()
-        return self.app
-
-    def setUp(self):
-        pass
-        super(BaseTestCase, self).setUp()
+    def __init__(self, http_client, base_url):
+        self.http_client = http_client
+        self.base_url = base_url
 
     def get(self, url, **kwargs):
         return self.http_client.fetch(self.get_url(url), **kwargs)
@@ -44,5 +36,4 @@ class BaseTestCase(AsyncHTTPTestCase):
         return self.post(url, put_data, **kwargs)
 
     def get_url(self, path):
-        return '%s://localhost:%s%s' % (self.get_protocol(),
-                self.get_http_port(), path)
+        return self.base_url + path

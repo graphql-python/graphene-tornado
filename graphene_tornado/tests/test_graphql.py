@@ -1,55 +1,53 @@
 import json
 from urllib import urlencode
 
-from hamcrest import assert_that, equal_to
+import pytest
 from tornado.httpclient import HTTPError
-from tornado.testing import gen_test
 
-from graphene_tornado.tests.base_test_case import BaseTestCase
+from examples.example import ExampleApplication
+from graphene_tornado.tests.http_helper import HttpHelper
+
+graphql_header = {'Content-Type': 'application/graphql'}
+form_header = {'Content-Type': 'application/x-www-form-urlencoded'}
 
 
-class TestGraphQL(BaseTestCase):
+@pytest.fixture
+def app():
+    return ExampleApplication()
 
-    graphql_header = {'Content-Type': 'application/graphql'}
-    form_header = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-    def url_string(self, string='/graphql', **url_params):
-        if url_params:
-            string += '?' + urlencode(url_params)
+@pytest.fixture
+def http_helper(http_client, base_url):
+    return HttpHelper(http_client, base_url)
 
-        return string
 
-    def batch_url_string(self, **url_params):
-        return self.url_string('/graphql/batch', **url_params)
+@pytest.mark.gen_test
+def test_allows_get_with_query_param(http_helper):
+    response = yield http_helper.get(url_string(query='{test}'), headers=graphql_header)
 
-    def response_json(self, response):
-        return json.loads(response.body)
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello World"}
+    }
 
-    @gen_test
-    def test_allows_get_with_query_param(self):
-        response = yield self.get(self.url_string(query='{test}'), headers=self.graphql_header)
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello World"}
-        }))
+@pytest.mark.gen_test
+def test_allows_get_with_variable_values(http_helper):
+    response = yield http_helper.get(url_string(
+        query='query helloWho($who: String){ test(who: $who) }',
+        variables=json.dumps({'who': "Dolly"})
+    ), headers=graphql_header)
 
-    @gen_test
-    def test_allows_get_with_variable_values(self):
-        response = yield self.get(self.url_string(
-            query='query helloWho($who: String){ test(who: $who) }',
-            variables=json.dumps({'who': "Dolly"})
-        ), headers=self.graphql_header)
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
 
-    @gen_test
-    def test_allows_get_with_operation_name(self):
-        response = yield self.get(self.url_string(
-            query='''
+@pytest.mark.gen_test
+def test_allows_get_with_operation_name(http_helper):
+    response = yield http_helper.get(url_string(
+        query='''
             query helloYou { test(who: "You"), ...shared }
             query helloWorld { test(who: "World"), ...shared }
             query helloDolly { test(who: "Dolly"), ...shared }
@@ -57,269 +55,287 @@ class TestGraphQL(BaseTestCase):
               shared: test(who: "Everyone")
             }
             ''',
-            operationName='helloWorld'
-        ), headers=self.graphql_header)
+        operationName='helloWorld'
+    ), headers=graphql_header)
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {
-                'test': 'Hello World',
-                'shared': 'Hello Everyone'
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {
+            'test': 'Hello World',
+            'shared': 'Hello Everyone'
+        }
+    }
+
+
+@pytest.mark.gen_test
+def test_reports_validation_errors(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(
+            query='{ test, unknownOne, unknownTwo }'
+        ), headers=graphql_header)
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [
+            {
+                'message': 'Cannot query field "unknownOne" on type "QueryRoot".',
+                'locations': [{'line': 1, 'column': 9}]
+            },
+            {
+                'message': 'Cannot query field "unknownTwo" on type "QueryRoot".',
+                'locations': [{'line': 1, 'column': 21}]
             }
-        }))
+        ]
+    }
 
-    @gen_test
-    def test_reports_validation_errors(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(
-                query='{ test, unknownOne, unknownTwo }'
-            ), headers=self.graphql_header)
 
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [
-                {
-                    'message': 'Cannot query field "unknownOne" on type "QueryRoot".',
-                    'locations': [{'line': 1, 'column': 9}]
-                },
-                {
-                    'message': 'Cannot query field "unknownTwo" on type "QueryRoot".',
-                    'locations': [{'line': 1, 'column': 21}]
-                }
-            ]
-        }))
-
-    @gen_test
-    def test_errors_when_missing_operation_name(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(
-                query='''
+@pytest.mark.gen_test
+def test_errors_when_missing_operation_name(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(
+            query='''
                 query TestQuery { test }
                 mutation TestMutation { writeTest { test } }
                 '''
-            ))
+        ))
 
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [
-                {
-                    'message': 'Must provide operation name if query contains multiple operations.'
-                }
-            ]
-        }))
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [
+            {
+                'message': 'Must provide operation name if query contains multiple operations.'
+            }
+        ]
+    }
 
-    @gen_test
-    def test_errors_when_sending_a_mutation_via_get(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(
-                query='''
+
+@pytest.mark.gen_test
+def test_errors_when_sending_a_mutation_via_get(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(
+            query='''
                 mutation TestMutation { writeTest { test } }
                 '''
-            ), headers=self.graphql_header)
+        ), headers=graphql_header)
 
-        assert_that(context.exception.code, equal_to(405))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [
-                {
-                    'message': 'Can only perform a mutation operation from a POST request.'
-                }
-            ]
-        }))
+    assert context.value.code == 405
+    assert response_json(context.value.response) == {
+        'errors': [
+            {
+                'message': 'Can only perform a mutation operation from a POST request.'
+            }
+        ]
+    }
 
-    @gen_test
-    def test_errors_when_selecting_a_mutation_within_a_get(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(
-                query='''
+
+@pytest.mark.gen_test
+def test_errors_when_selecting_a_mutation_within_a_get(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(
+            query='''
                 query TestQuery { test }
                 mutation TestMutation { writeTest { test } }
                 ''',
-                operationName='TestMutation'
-            ), headers=self.graphql_header)
+            operationName='TestMutation'
+        ), headers=graphql_header)
 
-        assert_that(context.exception.code, equal_to(405))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [
-                {
-                    'message': 'Can only perform a mutation operation from a POST request.'
-                }
-            ]
-        }))
+    assert context.value.code == 405
+    assert response_json(context.value.response) == {
+        'errors': [
+            {
+                'message': 'Can only perform a mutation operation from a POST request.'
+            }
+        ]
+    }
 
-    @gen_test
-    def test_allows_mutation_to_exist_within_a_get(self):
-        response = yield self.get(self.url_string(
-            query='''
+
+@pytest.mark.gen_test
+def test_allows_mutation_to_exist_within_a_get(http_helper):
+    response = yield http_helper.get(url_string(
+        query='''
             query TestQuery { test }
             mutation TestMutation { writeTest { test } }
             ''',
-            operationName='TestQuery'
-        ), headers=self.graphql_header)
+        operationName='TestQuery'
+    ), headers=graphql_header)
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello World"}
-        }))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello World"}
+    }
 
-    @gen_test
-    def test_allows_post_with_json_encoding(self):
-        response = yield self.post_json(self.url_string(), dict(query='{test}'))
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello World"}
-        }))
+@pytest.mark.gen_test
+def test_allows_post_with_json_encoding(http_helper):
+    response = yield http_helper.post_json(url_string(), dict(query='{test}'))
 
-    @gen_test
-    def test_batch_allows_post_with_json_encoding(self):
-        response = yield self.post_json(self.batch_url_string(), [dict(id=1, query='{test}')])
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello World"}
+    }
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to([{
-            'id': 1,
-            'data': {'test': "Hello World"},
-            'status': 200,
-        }]))
 
-    @gen_test
-    def test_batch_fails_if_is_empty(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.post_body(self.batch_url_string(), body='[]', headers={'Content-Type': 'application/json'})
+@pytest.mark.gen_test
+def test_batch_allows_post_with_json_encoding(http_helper):
+    response = yield http_helper.post_json(batch_url_string(), [dict(id=1, query='{test}')])
 
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'Received an empty list in the batch request.'}]
-        }))
+    assert response.code == 200
+    assert response_json(response) == [{
+        'id': 1,
+        'data': {'test': "Hello World"},
+        'status': 200,
+    }]
 
-    @gen_test
-    def test_allows_sending_a_mutation_via_post(self):
-        response = yield self.post_json(self.url_string(), dict(query='mutation TestMutation { writeTest { test } }'))
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'writeTest': {'test': 'Hello World'}}
-        }))
+@pytest.mark.gen_test
+def test_batch_fails_if_is_empty(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.post_body(batch_url_string(), body='[]', headers={'Content-Type': 'application/json'})
 
-    @gen_test
-    def test_allows_post_with_url_encoding(self):
-        response = yield self.post_body(self.url_string(), body=urlencode(dict(query='{test}')),
-                                        headers=self.form_header)
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'Received an empty list in the batch request.'}]
+    }
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello World"}
-        }))
 
-    @gen_test
-    def test_supports_post_json_query_with_string_variables(self):
-        response = yield self.post_json(self.url_string(), dict(
-            query='query helloWho($who: String){ test(who: $who) }',
-            variables=json.dumps({'who': "Dolly"})
-        ))
+@pytest.mark.gen_test
+def test_allows_sending_a_mutation_via_post(http_helper):
+    response = yield http_helper.post_json(url_string(), dict(query='mutation TestMutation { writeTest { test } }'))
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'writeTest': {'test': 'Hello World'}}
+    }
 
-    @gen_test
-    def test_batch_supports_post_json_query_with_string_variables(self):
-        response = yield self.post_json(self.batch_url_string(), [dict(
-            id=1,
-            query='query helloWho($who: String){ test(who: $who) }',
-            variables={'who': "Dolly"}
-        )])
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to([{
-            'id': 1,
-            'data': {'test': "Hello Dolly"},
-            'status': 200,
-        }]))
+@pytest.mark.gen_test
+def test_allows_post_with_url_encoding(http_helper):
+    response = yield http_helper.post_body(url_string(), body=urlencode(dict(query='{test}')), headers=form_header)
 
-    @gen_test
-    def test_supports_post_json_query_with_json_variables(self):
-        response = yield self.post_json(self.url_string(), dict(
-            query='query helloWho($who: String){ test(who: $who) }',
-            variables={'who': "Dolly"}
-        ))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello World"}
+    }
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
 
-    @gen_test
-    def test_batch_supports_post_json_query_with_json_variables(self):
-        response = yield self.post_json(self.batch_url_string(), [dict(
-            id=1,
-            query='query helloWho($who: String){ test(who: $who) }',
-            variables={'who': "Dolly"}
-        )])
+@pytest.mark.gen_test
+def test_supports_post_json_query_with_string_variables(http_helper):
+    response = yield http_helper.post_json(url_string(), dict(
+        query='query helloWho($who: String){ test(who: $who) }',
+        variables=json.dumps({'who': "Dolly"})
+    ))
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to([{
-            'id': 1,
-            'data': {'test': "Hello Dolly"},
-            'status': 200,
-        }]))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
 
-    @gen_test
-    def test_supports_post_url_encoded_query_with_string_variables(self):
-        response = yield self.post_body(self.url_string(), body=urlencode(dict(
-            query='query helloWho($who: String){ test(who: $who) }',
-            variables=json.dumps({'who': "Dolly"})
-        )), headers=self.form_header)
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
+@pytest.mark.gen_test
+def test_batch_supports_post_json_query_with_string_variables(http_helper):
+    response = yield http_helper.post_json(batch_url_string(), [dict(
+        id=1,
+        query='query helloWho($who: String){ test(who: $who) }',
+        variables={'who': "Dolly"}
+    )])
 
-    @gen_test
-    def test_supports_post_json_quey_with_get_variable_values(self):
-        response = yield self.post_json(self.url_string(
-            variables=json.dumps({'who': "Dolly"})
-        ), dict(
-            query='query helloWho($who: String){ test(who: $who) }',
-        ))
+    assert response.code == 200
+    assert response_json(response) == [{
+        'id': 1,
+        'data': {'test': "Hello Dolly"},
+        'status': 200,
+    }]
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
 
-    @gen_test
-    def test_post_url_encoded_query_with_get_variable_values(self):
-        response = yield self.post_body(self.url_string(
-            variables=json.dumps({'who': "Dolly"})
-        ), body=urlencode(dict(
-            query='query helloWho($who: String){ test(who: $who) }',
-        )), headers=self.form_header)
+@pytest.mark.gen_test
+def test_supports_post_json_query_with_json_variables(http_helper):
+    response = yield http_helper.post_json(url_string(), dict(
+        query='query helloWho($who: String){ test(who: $who) }',
+        variables={'who': "Dolly"}
+    ))
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
 
-    @gen_test
-    def test_supports_post_raw_text_query_with_get_variable_values(self):
-        response = yield self.post_body(self.url_string(
-            variables=json.dumps({'who': "Dolly"})
-        ),
-            body='query helloWho($who: String){ test(who: $who) }',
-            headers=self.graphql_header
-        )
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {'test': "Hello Dolly"}
-        }))
+@pytest.mark.gen_test
+def test_batch_supports_post_json_query_with_json_variables(http_helper):
+    response = yield http_helper.post_json(batch_url_string(), [dict(
+        id=1,
+        query='query helloWho($who: String){ test(who: $who) }',
+        variables={'who': "Dolly"}
+    )])
 
-    @gen_test
-    def test_allows_post_with_operation_name(self):
-        response = yield self.post_json(self.url_string(), dict(
-            query='''
+    assert response.code == 200
+    assert response_json(response) == [{
+        'id': 1,
+        'data': {'test': "Hello Dolly"},
+        'status': 200,
+    }]
+
+
+@pytest.mark.gen_test
+def test_supports_post_url_encoded_query_with_string_variables(http_helper):
+    response = yield http_helper.post_body(url_string(), body=urlencode(dict(
+        query='query helloWho($who: String){ test(who: $who) }',
+        variables=json.dumps({'who': "Dolly"})
+    )), headers=form_header)
+
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
+
+
+@pytest.mark.gen_test
+def test_supports_post_json_quey_with_get_variable_values(http_helper):
+    response = yield http_helper.post_json(url_string(
+        variables=json.dumps({'who': "Dolly"})
+    ), dict(
+        query='query helloWho($who: String){ test(who: $who) }',
+    ))
+
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
+
+
+@pytest.mark.gen_test
+def test_post_url_encoded_query_with_get_variable_values(http_helper):
+    response = yield http_helper.post_body(url_string(
+        variables=json.dumps({'who': "Dolly"})
+    ), body=urlencode(dict(
+        query='query helloWho($who: String){ test(who: $who) }',
+    )), headers=form_header)
+
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
+
+
+@pytest.mark.gen_test
+def test_supports_post_raw_text_query_with_get_variable_values(http_helper):
+    response = yield http_helper.post_body(url_string(
+        variables=json.dumps({'who': "Dolly"})
+    ),
+        body='query helloWho($who: String){ test(who: $who) }',
+        headers=graphql_header
+    )
+
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {'test': "Hello Dolly"}
+    }
+
+
+@pytest.mark.gen_test
+def test_allows_post_with_operation_name(http_helper):
+    response = yield http_helper.post_json(url_string(), dict(
+        query='''
             query helloYou { test(who: "You"), ...shared }
             query helloWorld { test(who: "World"), ...shared }
             query helloDolly { test(who: "Dolly"), ...shared }
@@ -327,22 +343,23 @@ class TestGraphQL(BaseTestCase):
               shared: test(who: "Everyone")
             }
             ''',
-            operationName='helloWorld'
-        ))
+        operationName='helloWorld'
+    ))
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {
-                'test': 'Hello World',
-                'shared': 'Hello Everyone'
-            }
-        }))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {
+            'test': 'Hello World',
+            'shared': 'Hello Everyone'
+        }
+    }
 
-    @gen_test
-    def test_batch_allows_post_with_operation_name(self):
-        response = yield self.post_json(self.batch_url_string(), [dict(
-            id=1,
-            query='''
+
+@pytest.mark.gen_test
+def test_batch_allows_post_with_operation_name(http_helper):
+    response = yield http_helper.post_json(batch_url_string(), [dict(
+        id=1,
+        query='''
             query helloYou { test(who: "You"), ...shared }
             query helloWorld { test(who: "World"), ...shared }
             query helloDolly { test(who: "Dolly"), ...shared }
@@ -350,167 +367,187 @@ class TestGraphQL(BaseTestCase):
               shared: test(who: "Everyone")
             }
             ''',
-            operationName='helloWorld'
-        )])
+        operationName='helloWorld'
+    )])
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to([{
-            'id': 1,
-            'data': {
-                'test': 'Hello World',
-                'shared': 'Hello Everyone'
-            },
-            'status': 200,
-        }]))
+    assert response.code == 200
+    assert response_json(response) == [{
+        'id': 1,
+        'data': {
+            'test': 'Hello World',
+            'shared': 'Hello Everyone'
+        },
+        'status': 200,
+    }]
 
-    @gen_test
-    def test_allows_post_with_get_operation_name(self):
-        response = yield self.post_body(self.url_string(
-            operationName='helloWorld'
-        ), body='''
+
+@pytest.mark.gen_test
+def test_allows_post_with_get_operation_name(http_helper):
+    response = yield http_helper.post_body(url_string(
+        operationName='helloWorld'
+    ), body='''
         query helloYou { test(who: "You"), ...shared }
         query helloWorld { test(who: "World"), ...shared }
         query helloDolly { test(who: "Dolly"), ...shared }
         fragment shared on QueryRoot {
           shared: test(who: "Everyone")
         }
-        ''', headers=self.graphql_header)
+        ''', headers=graphql_header)
 
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {
-                'test': 'Hello World',
-                'shared': 'Hello Everyone'
-            }
-        }))
-
-    @gen_test
-    def test_supports_pretty_printing(self):
-        response = yield self.get(self.url_string(query='{test}', pretty=True), headers=self.graphql_header)
-
-        assert_that(response.body, equal_to(
-            '{\n'
-            '  "data": {\n'
-            '    "test": "Hello World"\n'
-            '  }\n'
-            '}'
-        ))
-
-    @gen_test
-    def test_supports_pretty_printing_by_request(self):
-        response = yield self.get(self.url_string(query='{test}', pretty='1'), headers=self.graphql_header)
-
-        assert_that(response.body, equal_to(
-            '{\n'
-            '  "data": {\n'
-            '    "test": "Hello World"\n'
-            '  }\n'
-            '}'
-        ))
-
-    @gen_test
-    def test_handles_field_errors_caught_by_graphql(self):
-        response = yield self.get(self.url_string(query='{thrower}'), headers=self.graphql_header)
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': None,
-            'errors': [{'locations': [{'column': 2, 'line': 1}], 'message': 'Throws!'}]
-        }))
-
-    @gen_test
-    def test_handles_syntax_errors_caught_by_graphql(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(query='syntaxerror'), headers=self.graphql_header)
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'locations': [{'column': 1, 'line': 1}],
-                        'message': 'Syntax Error GraphQL request (1:1) '
-                                   'Unexpected Name "syntaxerror"\n\n1: syntaxerror\n   ^\n'}]
-        }))
-
-    @gen_test
-    def test_handles_errors_caused_by_a_lack_of_query(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(), headers=self.graphql_header)
-
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'Must provide query string.'}]
-        }))
-
-    @gen_test
-    def test_handles_not_expected_json_bodies(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.post_body(self.url_string(), body='[]', headers={'Content-Type': 'application/json'})
-
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'The received data is not a valid JSON query.'}]
-        }))
-
-    @gen_test
-    def test_handles_invalid_json_bodies(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.post_body(self.url_string(), body='[oh}', headers={'Content-Type': 'application/json'})
-
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'POST body sent invalid JSON.'}]
-        }))
-
-    @gen_test
-    def test_handles_incomplete_json_bodies(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.post_body(self.url_string(), body='{"query":', headers={'Content-Type': 'application/json'})
-
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'POST body sent invalid JSON.'}]
-        }))
-
-    @gen_test
-    def test_handles_plain_post_text(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.post_body(self.url_string(
-                variables=json.dumps({'who': "Dolly"})
-            ),
-                body='query helloWho($who: String){ test(who: $who) }',
-                headers={'Content-Type': 'text/plain'}
-            )
-
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'Must provide query string.'}]
-        }))
-
-    @gen_test
-    def test_handles_poorly_formed_variables(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.get(self.url_string(
-                query='query helloWho($who: String){ test(who: $who) }',
-                variables='who:You'
-            ), headers=self.graphql_header)
-
-        assert_that(context.exception.code, equal_to(400))
-        assert_that(self.response_json(context.exception.response), equal_to({
-            'errors': [{'message': 'Variables are invalid JSON.'}]
-        }))
-
-    @gen_test
-    def test_handles_unsupported_http_methods(self):
-        with self.assertRaises(HTTPError) as context:
-            yield self.put(self.url_string(query='{test}'), '', headers=self.graphql_header)
-        assert_that(context.exception.code, equal_to(405))
-
-    @gen_test
-    def test_passes_request_into_context_request(self):
-        response = yield self.get(self.url_string(query='{request}', q='testing'), headers=self.graphql_header)
-
-        assert_that(response.code, equal_to(200))
-        assert_that(self.response_json(response), equal_to({
-            'data': {
-                'request': 'testing'
-            }
-        }))
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {
+            'test': 'Hello World',
+            'shared': 'Hello Everyone'
+        }
+    }
 
 
+@pytest.mark.gen_test
+def test_supports_pretty_printing(http_helper):
+    response = yield http_helper.get(url_string(query='{test}', pretty=True), headers=graphql_header)
+    assert response.body == """{
+  "data": {
+    "test": "Hello World"
+  }
+}"""
+
+
+@pytest.mark.gen_test
+def test_supports_pretty_printing_by_request(http_helper):
+    response = yield http_helper.get(url_string(query='{test}', pretty='1'), headers=graphql_header)
+    assert response.body == """{
+  "data": {
+    "test": "Hello World"
+  }
+}"""
+
+
+@pytest.mark.gen_test
+def test_handles_field_errors_caught_by_graphql(http_helper):
+    response = yield http_helper.get(url_string(query='{thrower}'), headers=graphql_header)
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': None,
+        'errors': [{'locations': [{'column': 2, 'line': 1}], 'message': 'Throws!'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_syntax_errors_caught_by_graphql(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(query='syntaxerror'), headers=graphql_header)
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'locations': [{'column': 1, 'line': 1}],
+                    'message': 'Syntax Error GraphQL request (1:1) '
+                               'Unexpected Name "syntaxerror"\n\n1: syntaxerror\n   ^\n'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_errors_caused_by_a_lack_of_query(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(), headers=graphql_header)
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'Must provide query string.'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_not_expected_json_bodies(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.post_body(url_string(), body='[]', headers={'Content-Type': 'application/json'})
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'The received data is not a valid JSON query.'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_invalid_json_bodies(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.post_body(url_string(), body='[oh}', headers={'Content-Type': 'application/json'})
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'POST body sent invalid JSON.'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_incomplete_json_bodies(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.post_body(url_string(), body='{"query":', headers={'Content-Type': 'application/json'})
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'POST body sent invalid JSON.'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_plain_post_text(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.post_body(url_string(
+            variables=json.dumps({'who': "Dolly"})
+        ),
+            body='query helloWho($who: String){ test(who: $who) }',
+            headers={'Content-Type': 'text/plain'}
+        )
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'Must provide query string.'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_poorly_formed_variables(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.get(url_string(
+            query='query helloWho($who: String){ test(who: $who) }',
+            variables='who:You'
+        ), headers=graphql_header)
+
+    assert context.value.code == 400
+    assert response_json(context.value.response) == {
+        'errors': [{'message': 'Variables are invalid JSON.'}]
+    }
+
+
+@pytest.mark.gen_test
+def test_handles_unsupported_http_methods(http_helper):
+    with pytest.raises(HTTPError) as context:
+        yield http_helper.put(url_string(query='{test}'), '', headers=graphql_header)
+    assert context.value.code == 405
+
+
+@pytest.mark.gen_test
+def test_passes_request_into_context_request(http_helper):
+    response = yield http_helper.get(url_string(query='{request}', q='testing'), headers=graphql_header)
+
+    assert response.code == 200
+    assert response_json(response) == {
+        'data': {
+            'request': 'testing'
+        }
+    }
+
+
+def url_string(string='/graphql', **url_params):
+    if url_params:
+        string += '?' + urlencode(url_params)
+
+    return string
+
+
+def batch_url_string(**url_params):
+    return url_string('/graphql/batch', **url_params)
+
+
+def response_json(response):
+    return json.loads(response.body)
