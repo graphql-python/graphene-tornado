@@ -429,7 +429,7 @@ def test_handles_field_errors_caught_by_graphql(http_helper):
     assert response.code == 200
     assert response_json(response) == {
         'data': None,
-        'errors': [{'locations': [{'column': 2, 'line': 1}], 'message': 'Throws!'}]
+        'errors': [{u'path': [u'thrower'], u'message': u'Throws!', u'locations': [{u'column': 2, u'line': 1}]}]
     }
 
 
