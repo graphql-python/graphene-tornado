@@ -553,4 +553,4 @@ def batch_url_string(**url_params):
 
 
 def response_json(response):
-    return json.loads(response.body)
+    return json.loads(to_unicode(response.body))
