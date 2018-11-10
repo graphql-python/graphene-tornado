@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import graphene
 from graphene import ObjectType, Schema
+from tornado.escape import to_unicode
 
 
 class QueryRoot(ObjectType):
@@ -14,7 +15,7 @@ class QueryRoot(ObjectType):
         raise Exception("Throws!")
 
     def resolve_request(self, info):
-        return info.context.arguments['q'][0]
+        return to_unicode(info.context.arguments['q'][0])
 
     def resolve_test(self, info, who=None):
         return 'Hello %s' % (who or 'World')

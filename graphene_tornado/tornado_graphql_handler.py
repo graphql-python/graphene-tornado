@@ -11,7 +11,7 @@ from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 from graphql.execution import ExecutionResult
 from tornado import web
-from tornado.escape import json_encode
+from tornado.escape import json_encode, to_unicode
 from tornado.gen import coroutine, Return
 from tornado.locks import Event
 from tornado.log import app_log
@@ -108,7 +108,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         content_type = self.content_type
 
         if content_type == 'application/graphql':
-            return {'query': self.request.body}
+            return {'query': to_unicode(self.request.body)}
 
         elif content_type == 'application/json':
             # noinspection PyBroadException
@@ -118,7 +118,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 raise ExecutionError(400, e)
 
             try:
-                request_json = json.loads(body)
+                request_json = json.loads(to_unicode(body))
                 if self.batch:
                     assert isinstance(request_json, list), (
                         'Batch requests should receive a list, but received {}.'
@@ -276,17 +276,16 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 continue
             yield middleware
 
-    @staticmethod
-    def get_graphql_params(request, data):
+    def get_graphql_params(self, request, data):
         single_args = {}
         for key in request.arguments.keys():
-            single_args[key] = request.arguments.get(key)[0]
+            single_args[key] = self.decode_argument(request.arguments.get(key)[0])
 
         query = single_args.get('query') or data.get('query')
         variables = single_args.get('variables') or data.get('variables')
         id = single_args.get('id') or data.get('id')
 
-        if variables and isinstance(variables, basestring):
+        if variables and isinstance(variables, six.string_types):
             try:
                 variables = json.loads(variables)
             except:
