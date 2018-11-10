@@ -29,4 +29,3 @@ class MutationRoot(ObjectType):
 
 
 schema = Schema(query=QueryRoot, mutation=MutationRoot)
-
