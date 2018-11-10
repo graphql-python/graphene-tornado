@@ -9,8 +9,10 @@ with open('graphene_tornado/__init__.py', 'rb') as f:
         f.read().decode('utf-8')).group(1)))
 
 tests_require = [
+    'coveralls',
     'mock',
     'pytest',
+    'pytest-cov',
     'pytest-tornado'
 ]
 

@@ -47,7 +47,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
     graphiql_html_title = None
 
     def initialize(self, schema=None, executor=None, middleware=None, root_value=None, graphiql=False, pretty=False,
-                 batch=False):
+                   batch=False):
         super(TornadoGraphQLHandler, self).initialize()
         self.schema = schema
         if middleware is not None:
@@ -159,7 +159,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
 
             if getattr(execution_result, 'is_pending', False):
                 event = Event()
-                on_resolve = lambda *_: event.set()
+                on_resolve = lambda *_: event.set()  # noqa
                 execution_result.then(on_resolve).catch(on_resolve)
                 yield event.wait()
 
@@ -211,7 +211,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 if show_graphiql:
                     raise Return(None)
 
-                raise HTTPError(405, 'Can only perform a {} operation from a POST request.'.format(operation_ast.operation))
+                raise HTTPError(405, 'Can only perform a {} operation from a POST request.'
+                                .format(operation_ast.operation))
 
         try:
             result = yield self.execute(
@@ -288,7 +289,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         if variables and isinstance(variables, six.string_types):
             try:
                 variables = json.loads(variables)
-            except:
+            except:  # noqa
                 raise HTTPError(400, 'Variables are invalid JSON.')
 
         operation_name = single_args.get('operationName') or data.get('operationName')

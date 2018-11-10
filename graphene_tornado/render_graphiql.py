@@ -192,4 +192,3 @@ def render_graphiql(query, variables, operation_name, result, graphiql_version=N
 
     tmpl = jinja.from_string(template)
     return tmpl.render(context)
-
