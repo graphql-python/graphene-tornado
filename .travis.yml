@@ -1,10 +1,12 @@
 language: python
-sudo: false
+sudo: required
+dist: xenial
 python:
 - 2.7
 - 3.4
 - 3.5
 - 3.6
+- 3.7
 install:
 - |
   if [ "$TEST_TYPE" = build ]; then
@@ -41,11 +43,9 @@ matrix:
     env: TEST_TYPE=build
   - python: '3.6'
     env: TEST_TYPE=build
-  - python: '3.5'
-    env: TEST_TYPE=build
-  - python: '3.6'
+  - python: '3.7'
     env: TEST_TYPE=build
   - python: '2.7'
     env: TEST_TYPE=lint
-  - python: '3.6'
+  - python: '3.7'
     env: TEST_TYPE=lint
