@@ -1,5 +1,6 @@
 .eggs
 .idea
+.coverage
 .pytest_cache
 
 *.pyc
