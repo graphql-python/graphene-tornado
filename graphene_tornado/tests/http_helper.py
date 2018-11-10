@@ -1,5 +1,8 @@
+from __future__ import absolute_import, division, print_function
+
 import json
-import urllib
+
+from six.moves.urllib.parse import urlencode
 
 
 class HttpHelper:
@@ -17,7 +20,7 @@ class HttpHelper:
 
     def post(self, url, post_data, **kwargs):
         kwargs['method'] = kwargs.get('method', 'POST')
-        kwargs['body'] = urllib.urlencode(post_data)
+        kwargs['body'] = urlencode(post_data)
         return self.get(url, **kwargs)
 
     def post_body(self, url, **kwargs):

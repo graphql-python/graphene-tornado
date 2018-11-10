@@ -1,6 +1,6 @@
 # graphene-tornado
 
-A project for running [Graphene](http://graphene-python.org/) on top of [Tornado](http://www.tornadoweb.org/) in Python 2.7. The codebase is a port of [graphene-django](https://github.com/graphql-python/graphene-django).
+A project for running [Graphene](http://graphene-python.org/) on top of [Tornado](http://www.tornadoweb.org/) in Python 2 and 3. The codebase is a port of [graphene-django](https://github.com/graphql-python/graphene-django).
 
 # Examples
 

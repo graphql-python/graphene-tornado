@@ -1,4 +1,7 @@
+from __future__ import absolute_import, division, print_function
+
 import pytest
+from tornado.escape import to_unicode
 
 from examples.example import ExampleApplication
 from graphene_tornado.tests.http_helper import HttpHelper
@@ -39,7 +42,7 @@ def test_graphiql_is_enabled(http_helper):
 @pytest.mark.gen_test
 def test_graphiql_default_title(http_helper):
     res = yield http_helper.get('/graphql', headers={'Accept': 'text/html'})
-    assert '<title>GraphiQL</title>' in res.body
+    assert '<title>GraphiQL</title>' in to_unicode(res.body)
 
 
 @pytest.mark.gen_test
@@ -52,7 +55,7 @@ def test_graphiql_renders_pretty(http_helper):
         '  }\n'
         '}'
     ).replace("\"", "\\\"").replace("\n", "\\n")
-    assert pretty_response in response.body
+    assert pretty_response in to_unicode(response.body)
 
 
 @pytest.mark.gen_test
@@ -65,7 +68,7 @@ def test_graphiql_renders_pretty(http_helper):
         '  }\n'
         '}'
     ).replace("\"", "\\\"").replace("\n", "\\n")
-    assert pretty_response in response.body
+    assert pretty_response in to_unicode(response.body)
 
 
 @pytest.mark.gen_test
@@ -79,5 +82,5 @@ def test_handles_empty_vars(http_helper):
 
 
 def has_graphiql(response):
-    assert "ReactDOM" in response.body
+    assert "ReactDOM" in to_unicode(response.body)
     assert response.code == 200

@@ -49,7 +49,7 @@ setup(
         'six>=1.10.0',
         'graphene>=2.0.1',
         'Jinja2==2.9.6',
-        'tornado>=4.2',
+        'tornado>=5.1.0',
         'werkzeug==0.12.2'
     ],
     setup_requires=[

@@ -1,14 +1,18 @@
+from __future__ import absolute_import, division, print_function
+
 import json
-from urllib import urlencode
+
+from six.moves.urllib.parse import urlencode
 
 import pytest
+from tornado.escape import to_unicode
 from tornado.httpclient import HTTPError
 
 from examples.example import ExampleApplication
 from graphene_tornado.tests.http_helper import HttpHelper
 
-graphql_header = {'Content-Type': 'application/graphql'}
-form_header = {'Content-Type': 'application/x-www-form-urlencoded'}
+GRAPHQL_HEADER = {'Content-Type': 'application/graphql'}
+FORM_HEADER = {'Content-Type': 'application/x-www-form-urlencoded'}
 
 
 @pytest.fixture
@@ -23,7 +27,7 @@ def http_helper(http_client, base_url):
 
 @pytest.mark.gen_test
 def test_allows_get_with_query_param(http_helper):
-    response = yield http_helper.get(url_string(query='{test}'), headers=graphql_header)
+    response = yield http_helper.get(url_string(query='{test}'), headers=GRAPHQL_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -36,7 +40,7 @@ def test_allows_get_with_variable_values(http_helper):
     response = yield http_helper.get(url_string(
         query='query helloWho($who: String){ test(who: $who) }',
         variables=json.dumps({'who': "Dolly"})
-    ), headers=graphql_header)
+    ), headers=GRAPHQL_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -56,7 +60,7 @@ def test_allows_get_with_operation_name(http_helper):
             }
             ''',
         operationName='helloWorld'
-    ), headers=graphql_header)
+    ), headers=GRAPHQL_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -72,7 +76,7 @@ def test_reports_validation_errors(http_helper):
     with pytest.raises(HTTPError) as context:
         yield http_helper.get(url_string(
             query='{ test, unknownOne, unknownTwo }'
-        ), headers=graphql_header)
+        ), headers=GRAPHQL_HEADER)
 
     assert context.value.code == 400
     assert response_json(context.value.response) == {
@@ -116,7 +120,7 @@ def test_errors_when_sending_a_mutation_via_get(http_helper):
             query='''
                 mutation TestMutation { writeTest { test } }
                 '''
-        ), headers=graphql_header)
+        ), headers=GRAPHQL_HEADER)
 
     assert context.value.code == 405
     assert response_json(context.value.response) == {
@@ -137,7 +141,7 @@ def test_errors_when_selecting_a_mutation_within_a_get(http_helper):
                 mutation TestMutation { writeTest { test } }
                 ''',
             operationName='TestMutation'
-        ), headers=graphql_header)
+        ), headers=GRAPHQL_HEADER)
 
     assert context.value.code == 405
     assert response_json(context.value.response) == {
@@ -157,7 +161,7 @@ def test_allows_mutation_to_exist_within_a_get(http_helper):
             mutation TestMutation { writeTest { test } }
             ''',
         operationName='TestQuery'
-    ), headers=graphql_header)
+    ), headers=GRAPHQL_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -210,7 +214,7 @@ def test_allows_sending_a_mutation_via_post(http_helper):
 
 @pytest.mark.gen_test
 def test_allows_post_with_url_encoding(http_helper):
-    response = yield http_helper.post_body(url_string(), body=urlencode(dict(query='{test}')), headers=form_header)
+    response = yield http_helper.post_body(url_string(), body=urlencode(dict(query='{test}')), headers=FORM_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -281,7 +285,7 @@ def test_supports_post_url_encoded_query_with_string_variables(http_helper):
     response = yield http_helper.post_body(url_string(), body=urlencode(dict(
         query='query helloWho($who: String){ test(who: $who) }',
         variables=json.dumps({'who': "Dolly"})
-    )), headers=form_header)
+    )), headers=FORM_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -309,7 +313,7 @@ def test_post_url_encoded_query_with_get_variable_values(http_helper):
         variables=json.dumps({'who': "Dolly"})
     ), body=urlencode(dict(
         query='query helloWho($who: String){ test(who: $who) }',
-    )), headers=form_header)
+    )), headers=FORM_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -323,7 +327,7 @@ def test_supports_post_raw_text_query_with_get_variable_values(http_helper):
         variables=json.dumps({'who': "Dolly"})
     ),
         body='query helloWho($who: String){ test(who: $who) }',
-        headers=graphql_header
+        headers=GRAPHQL_HEADER
     )
 
     assert response.code == 200
@@ -392,7 +396,7 @@ def test_allows_post_with_get_operation_name(http_helper):
         fragment shared on QueryRoot {
           shared: test(who: "Everyone")
         }
-        ''', headers=graphql_header)
+        ''', headers=GRAPHQL_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -405,8 +409,8 @@ def test_allows_post_with_get_operation_name(http_helper):
 
 @pytest.mark.gen_test
 def test_supports_pretty_printing(http_helper):
-    response = yield http_helper.get(url_string(query='{test}', pretty=True), headers=graphql_header)
-    assert response.body == """{
+    response = yield http_helper.get(url_string(query='{test}', pretty=True), headers=GRAPHQL_HEADER)
+    assert to_unicode(response.body) == """{
   "data": {
     "test": "Hello World"
   }
@@ -415,8 +419,8 @@ def test_supports_pretty_printing(http_helper):
 
 @pytest.mark.gen_test
 def test_supports_pretty_printing_by_request(http_helper):
-    response = yield http_helper.get(url_string(query='{test}', pretty='1'), headers=graphql_header)
-    assert response.body == """{
+    response = yield http_helper.get(url_string(query='{test}', pretty='1'), headers=GRAPHQL_HEADER)
+    assert to_unicode(response.body) == """{
   "data": {
     "test": "Hello World"
   }
@@ -425,7 +429,7 @@ def test_supports_pretty_printing_by_request(http_helper):
 
 @pytest.mark.gen_test
 def test_handles_field_errors_caught_by_graphql(http_helper):
-    response = yield http_helper.get(url_string(query='{thrower}'), headers=graphql_header)
+    response = yield http_helper.get(url_string(query='{thrower}'), headers=GRAPHQL_HEADER)
     assert response.code == 200
     assert response_json(response) == {
         'data': None,
@@ -436,7 +440,7 @@ def test_handles_field_errors_caught_by_graphql(http_helper):
 @pytest.mark.gen_test
 def test_handles_syntax_errors_caught_by_graphql(http_helper):
     with pytest.raises(HTTPError) as context:
-        yield http_helper.get(url_string(query='syntaxerror'), headers=graphql_header)
+        yield http_helper.get(url_string(query='syntaxerror'), headers=GRAPHQL_HEADER)
     assert context.value.code == 400
     assert response_json(context.value.response) == {
         'errors': [{'locations': [{'column': 1, 'line': 1}],
@@ -448,7 +452,7 @@ def test_handles_syntax_errors_caught_by_graphql(http_helper):
 @pytest.mark.gen_test
 def test_handles_errors_caused_by_a_lack_of_query(http_helper):
     with pytest.raises(HTTPError) as context:
-        yield http_helper.get(url_string(), headers=graphql_header)
+        yield http_helper.get(url_string(), headers=GRAPHQL_HEADER)
 
     assert context.value.code == 400
     assert response_json(context.value.response) == {
@@ -511,7 +515,7 @@ def test_handles_poorly_formed_variables(http_helper):
         yield http_helper.get(url_string(
             query='query helloWho($who: String){ test(who: $who) }',
             variables='who:You'
-        ), headers=graphql_header)
+        ), headers=GRAPHQL_HEADER)
 
     assert context.value.code == 400
     assert response_json(context.value.response) == {
@@ -522,13 +526,13 @@ def test_handles_poorly_formed_variables(http_helper):
 @pytest.mark.gen_test
 def test_handles_unsupported_http_methods(http_helper):
     with pytest.raises(HTTPError) as context:
-        yield http_helper.put(url_string(query='{test}'), '', headers=graphql_header)
+        yield http_helper.put(url_string(query='{test}'), '', headers=GRAPHQL_HEADER)
     assert context.value.code == 405
 
 
 @pytest.mark.gen_test
 def test_passes_request_into_context_request(http_helper):
-    response = yield http_helper.get(url_string(query='{request}', q='testing'), headers=graphql_header)
+    response = yield http_helper.get(url_string(query='{request}', q='testing'), headers=GRAPHQL_HEADER)
 
     assert response.code == 200
     assert response_json(response) == {
@@ -541,7 +545,6 @@ def test_passes_request_into_context_request(http_helper):
 def url_string(string='/graphql', **url_params):
     if url_params:
         string += '?' + urlencode(url_params)
-
     return string
 
 
