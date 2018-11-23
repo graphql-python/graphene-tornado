@@ -49,3 +49,11 @@ matrix:
     env: TEST_TYPE=lint
   - python: '3.7'
     env: TEST_TYPE=lint
+deploy:
+  provider: pypi
+  user: ewhauser
+  skip_existing: true
+  on:
+    tags: true
+  password:
+    secure: pdZGNHjop+aRXk0YDdoD2iWqDPRUXrGRd1QP2R3ITUgvSCTbUoEK6ePQFSS9EXgO8nLJLWUOJ5UxjfnCUL4eBj0wET4OROI0hR9Z6Q5F5eXULxNp4q4ekexeaDxcmYO5wmSA6y+D3RFFlgUXFx88NN+foC0PusaG17g4S5E45euinsF9OwP5BjtkUVIBo6McM+UIq7OGFP4ue29P+PXWjRMbZ3XLDR26tRsySt6g86xwZdMvmLl4uDsaQ6blRvHUlWBbw4+uCyus6dz8FJsUFVwiDNVzgqIBW+djSh7mtOBkRf63eORLXfjWA6R3BR8+KKjoix8oIH3ZGSnv1PjkSE9+r6eWEeUwWzSgTzcY/30IDGY3Ca1bA8APk87Glq6SnXsOl5opWPB6CJM63Ygkg7R2+tpTSYxykXXAMevdbKoaZnwZA3lc/NBbnPq0anbEg82M8rdpi6Xt9M9XPYmrMZtB1X8xj2bjsmBwEV5piHEfc0w3JBgJzK6tfGmbHV1JPf3Sn01e7LNBaE1/tHGZnI4DXJNmB/JPxKl1ZM6lRJlfEvLX1XCMziPC4OaotVO8ZuiwQq//CVNjy3cji/dCiutF0qMvfp24Ai1WDtDgh1VMvEru8rRjWwRPvh8bz/eWrrTQH2CUjRULFkpSqeoJaRJhYigMZSryKvgUwMQVJew=
