@@ -220,7 +220,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 root_value=self.root_value,
                 variable_values=variables,
                 operation_name=operation_name,
-                context_value=self.request,
+                context_value=self.context,
                 middleware=self.middleware,
                 executor=self.executor or TornadoExecutor(),
                 return_promise=True
