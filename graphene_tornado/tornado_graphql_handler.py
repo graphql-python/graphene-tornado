@@ -267,7 +267,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
 
     @property
     def context(self):
-        return None
+        return self.request
 
     @staticmethod
     def instantiate_middleware(middlewares):
