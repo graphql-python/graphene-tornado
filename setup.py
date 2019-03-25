@@ -11,7 +11,7 @@ with open('graphene_tornado/__init__.py', 'rb') as f:
 tests_require = [
     'coveralls',
     'mock',
-    'pytest',
+    'pytest==3.10.0',
     'pytest-cov',
     'pytest-tornado'
 ]
