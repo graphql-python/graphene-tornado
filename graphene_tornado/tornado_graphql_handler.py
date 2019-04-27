@@ -6,7 +6,7 @@ import sys
 import traceback
 
 import six
-from graphql import parse, validate, Source, get_operation_ast, execute
+from graphql import get_default_backend, execute, GraphQLSchema, validate
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 from graphql.execution import ExecutionResult
@@ -45,10 +45,12 @@ class TornadoGraphQLHandler(web.RequestHandler):
     graphiql_version = None
     graphiql_template = None
     graphiql_html_title = None
+    backend = None
 
     def initialize(self, schema=None, executor=None, middleware=None, root_value=None, graphiql=False, pretty=False,
-                   batch=False):
+                   batch=False, backend=None):
         super(TornadoGraphQLHandler, self).initialize()
+
         self.schema = schema
         if middleware is not None:
             self.middleware = list(self.instantiate_middleware(middleware))
@@ -57,6 +59,23 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.pretty = pretty
         self.graphiql = graphiql
         self.batch = batch
+        self.backend = backend or get_default_backend()
+
+    def get_root_value(self, request):
+        return self.root_value
+
+    def get_middleware(self, request):
+        return self.middleware
+
+    def get_context(self, request):
+        return self.request
+
+    def get_backend(self, request):
+        return self.backend
+
+    @property
+    def context(self):
+        return self.request
 
     @coroutine
     def get(self):
@@ -191,11 +210,14 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 raise Return(None)
             raise HTTPError(400, 'Must provide query string.')
 
-        source = Source(query, name='GraphQL request')
+        try:
+            backend = self.get_backend(self.request)
+            document = backend.document_from_string(self.schema, query)
+        except Exception as e:
+            raise Return(ExecutionResult(errors=[e], invalid=True))
 
         try:
-            document_ast = parse(source)
-            validation_errors = validate(self.schema, document_ast)
+            validation_errors = validate(self.schema, document.document_ast)
         except Exception as e:
             raise Return(ExecutionResult(errors=[e], invalid=True))
 
@@ -206,22 +228,22 @@ class TornadoGraphQLHandler(web.RequestHandler):
             ))
 
         if method.lower() == 'get':
-            operation_ast = get_operation_ast(document_ast, operation_name)
-            if operation_ast and operation_ast.operation != 'query':
+            operation_type = document.get_operation_type(operation_name)
+            if operation_type and operation_type != "query":
                 if show_graphiql:
                     raise Return(None)
 
                 raise HTTPError(405, 'Can only perform a {} operation from a POST request.'
-                                .format(operation_ast.operation))
+                                .format(operation_type))
 
         try:
             result = yield self.execute(
-                document_ast,
+                document.document_ast,
                 root_value=self.root_value,
                 variable_values=variables,
                 operation_name=operation_name,
-                context_value=self.context,
-                middleware=self.middleware,
+                context_value=self.get_context(self.request),
+                middleware=self.get_middleware(self.request),
                 executor=self.executor or TornadoExecutor(),
                 return_promise=True
             )
@@ -264,10 +286,6 @@ class TornadoGraphQLHandler(web.RequestHandler):
     @property
     def content_type(self):
         return self.request.headers.get('Content-Type', 'text/plain').split(';')[0]
-
-    @property
-    def context(self):
-        return self.request
 
     @staticmethod
     def instantiate_middleware(middlewares):
