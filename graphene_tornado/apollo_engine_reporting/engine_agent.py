@@ -40,7 +40,7 @@ EngineReportingOptions = NamedTuple('EngineReportingOptions', [
     ('request_agent', Optional[bool]),
     # ('max_attempts', Optional[int]),
     # ('minimum_retry_delay_ms', Optional[int]),
-    ('report_error_function', Optional),
+    ('report_error_function', Optional[Callable]),
     # ('private_variables', Optional[List[str]]),
     # ('private_headers', Optional[List[str]]),
     # ('handle_signals', Optional[bool]),

@@ -128,7 +128,7 @@ class EngineReportingExtension(GraphQLExtension):
         pass
 
     @coroutine
-    def execution_started(self, schema, document, root_value, context_value, variable_values, operation_name):
+    def execution_started(self, schema, document, root, context, variables, operation_name):
         if operation_name:
             self.operation_name = operation_name
         self.documentAST = document

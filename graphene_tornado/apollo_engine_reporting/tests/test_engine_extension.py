@@ -143,9 +143,9 @@ def test_trace():
     yield ext.execution_started(
         schema=schema,
         document=document,
-        root_value=None,
-        context_value=None,
-        variable_values=None,
+        root=None,
+        context=None,
+        variables=None,
         operation_name='q',
     )
 

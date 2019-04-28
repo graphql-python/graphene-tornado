@@ -273,18 +273,18 @@ class TornadoGraphQLHandler(web.RequestHandler):
         execution_ended = yield self.extension_stack.execution_started(
             schema=self.schema,
             document=document,
-            root_value=self.root_value,
-            context_value=context_value,
-            variable_values=variables,
+            root=self.root_value,
+            context=context_value,
+            variables=variables,
             operation_name=operation_name
         )
         try:
             result = yield self.execute(
                 document.document_ast,
-                root_value=self.root_value,
-                variable_values=variables,
+                root=self.root_value,
+                variables=variables,
                 operation_name=operation_name,
-                context_value=self.get_context(self.request),
+                context=self.get_context(self.request),
                 middleware=self.get_middleware(self.request),
                 executor=self.executor or TornadoExecutor(),
                 return_promise=True

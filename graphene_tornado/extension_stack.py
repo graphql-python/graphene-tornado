@@ -18,7 +18,7 @@ class GraphQLExtensionStack(GraphQLExtension):
     @coroutine
     def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
         on_end = yield self._handle_did_start('request_started', request, query_string, parsed_query, operation_name,
-                                      variables, context, request_context)
+                                              variables, context, request_context)
         raise Return(on_end)
 
     @coroutine
@@ -32,9 +32,9 @@ class GraphQLExtensionStack(GraphQLExtension):
         raise Return(on_end)
 
     @coroutine
-    def execution_started(self, schema, document, root_value, context_value, variable_values, operation_name):
-        on_end = yield self._handle_did_start('execution_started', schema, document, root_value, context_value,
-                                      variable_values, operation_name)
+    def execution_started(self, schema, document, root, context, variables, operation_name):
+        on_end = yield self._handle_did_start('execution_started', schema, document, root, context,
+                                              variables, operation_name)
         raise Return(on_end)
 
     @coroutine

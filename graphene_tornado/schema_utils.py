@@ -23,5 +23,5 @@ def generate_schema_hash(schema):
     # It's important that we perform a deterministic stringification here
     # since, depending on changes in the underlying `graphql-core` execution
     # layer, varying orders of the properties in the introspection
-    stringified_schema = stringify(schema)
+    stringified_schema = stringify(schema).encode('utf-8')
     return hashlib.sha512(stringified_schema).hexdigest()

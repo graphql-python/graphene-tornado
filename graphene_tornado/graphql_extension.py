@@ -42,12 +42,12 @@ class GraphQLExtension:
 
     @abstractmethod
     def execution_started(self,
-                          schema,           # type: GraphQLSchema
-                          document,         # type: Document
-                          root_value,       # type: Any
-                          context_value,    # type: Optional[Any]
-                          variable_values,  # type: Optional[Any]
-                          operation_name    # type: Optional[str]
+                          schema,  # type: GraphQLSchema
+                          document,  # type: Document
+                          root,  # type: Any
+                          context,  # type: Optional[Any]
+                          variables,  # type: Optional[Any]
+                          operation_name  # type: Optional[str]
                           ):
         # type: (...) -> EndHandler
         pass
