@@ -12,3 +12,4 @@ graphene_tornado.egg-info/
 apollo.config.js
 schema.graphql
 .env
+.tox
