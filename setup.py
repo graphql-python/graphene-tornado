@@ -11,9 +11,10 @@ with open('graphene_tornado/__init__.py', 'rb') as f:
 tests_require = [
     'coveralls',
     'mock',
-    'pytest==3.10.0',
-    'pytest-cov',
-    'pytest-tornado'
+    'pytest>=4.4.1',
+    'pytest-cov>=2.6.1',
+    'pytest-tornado>=0.7.0',
+    'tox'
 ]
 
 setup(
@@ -49,7 +50,7 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
-        'graphene>=2.0.1',
+        'graphene>=2.1',
         'Jinja2>=2.10.1',
         'tornado>=5.1.0',
         'werkzeug==0.12.2'

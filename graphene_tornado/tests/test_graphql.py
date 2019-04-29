@@ -444,7 +444,7 @@ def test_handles_syntax_errors_caught_by_graphql(http_helper):
     assert context.value.code == 400
     assert response_json(context.value.response) == {
         'errors': [{'locations': [{'column': 1, 'line': 1}],
-                    'message': 'Syntax Error GraphQL request (1:1) '
+                    'message': 'Syntax Error GraphQL (1:1) '
                                'Unexpected Name "syntaxerror"\n\n1: syntaxerror\n   ^\n'}]
     }
 
