@@ -6,7 +6,9 @@ import sys
 import traceback
 
 import six
-from graphql import get_default_backend, execute, GraphQLSchema, validate
+from graphene_tornado.render_graphiql import render_graphiql
+from graphene_tornado.tornado_executor import TornadoExecutor
+from graphql import get_default_backend, execute, validate
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 from graphql.execution import ExecutionResult
@@ -18,9 +20,6 @@ from tornado.log import app_log
 from tornado.web import HTTPError
 from werkzeug.datastructures import MIMEAccept
 from werkzeug.http import parse_accept_header
-
-from graphene_tornado.render_graphiql import render_graphiql
-from graphene_tornado.tornado_executor import TornadoExecutor
 
 
 class ExecutionError(Exception):
@@ -46,6 +45,9 @@ class TornadoGraphQLHandler(web.RequestHandler):
     graphiql_template = None
     graphiql_html_title = None
     backend = None
+    document = None
+    graphql_params = None
+    parsed_body = None
 
     def initialize(self, schema=None, executor=None, middleware=None, root_value=None, graphiql=False, pretty=False,
                    batch=False, backend=None):
@@ -61,21 +63,24 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.batch = batch
         self.backend = backend or get_default_backend()
 
-    def get_root_value(self, request):
-        return self.root_value
-
-    def get_middleware(self, request):
-        return self.middleware
-
-    def get_context(self, request):
-        return self.request
-
-    def get_backend(self, request):
-        return self.backend
-
     @property
     def context(self):
         return self.request
+
+    def get_root(self):
+        return self.root_value
+
+    def get_middleware(self):
+        return self.middleware
+
+    def get_backend(self):
+        return self.backend
+
+    def get_document(self):
+        return self.document
+
+    def get_parsed_body(self):
+        return self.parsed_body
 
     @coroutine
     def get(self):
@@ -127,8 +132,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
         content_type = self.content_type
 
         if content_type == 'application/graphql':
-            return {'query': to_unicode(self.request.body)}
-
+            self.parsed_body = {'query': to_unicode(self.request.body)}
+            return self.parsed_body
         elif content_type == 'application/json':
             # noinspection PyBroadException
             try:
@@ -149,16 +154,19 @@ class TornadoGraphQLHandler(web.RequestHandler):
                     assert isinstance(request_json, dict), (
                         'The received data is not a valid JSON query.'
                     )
-                return request_json
+                self.parsed_body = request_json
+                return self.parsed_body
             except AssertionError as e:
                 raise HTTPError(status_code=400, log_message=str(e))
             except (TypeError, ValueError):
                 raise HTTPError(status_code=400, log_message='POST body sent invalid JSON.')
 
         elif content_type in ['application/x-www-form-urlencoded', 'multipart/form-data']:
-            return self.request.query_arguments
+            self.parsed_body = self.request.query_arguments
+            return self.parsed_body
 
-        return {}
+        self.parsed_body = {}
+        return self.parsed_body
 
     @coroutine
     def get_response(self, data, method, show_graphiql=False):
@@ -210,14 +218,15 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 raise Return(None)
             raise HTTPError(400, 'Must provide query string.')
 
-        try:
-            backend = self.get_backend(self.request)
-            document = backend.document_from_string(self.schema, query)
-        except Exception as e:
-            raise Return(ExecutionResult(errors=[e], invalid=True))
+        if not self.document:
+            try:
+                backend = self.get_backend()
+                self.document = backend.document_from_string(self.schema, query)
+            except Exception as e:
+                raise Return(ExecutionResult(errors=[e], invalid=True))
 
         try:
-            validation_errors = validate(self.schema, document.document_ast)
+            validation_errors = validate(self.schema, self.document.document_ast)
         except Exception as e:
             raise Return(ExecutionResult(errors=[e], invalid=True))
 
@@ -228,7 +237,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
             ))
 
         if method.lower() == 'get':
-            operation_type = document.get_operation_type(operation_name)
+            operation_type = self.document.get_operation_type(operation_name)
             if operation_type and operation_type != "query":
                 if show_graphiql:
                     raise Return(None)
@@ -238,12 +247,12 @@ class TornadoGraphQLHandler(web.RequestHandler):
 
         try:
             result = yield self.execute(
-                document.document_ast,
-                root_value=self.root_value,
-                variable_values=variables,
+                self.document.document_ast,
+                root=self.get_root(),
+                variables=variables,
                 operation_name=operation_name,
-                context_value=self.get_context(self.request),
-                middleware=self.get_middleware(self.request),
+                context=self.context(),
+                middleware=self.get_middleware(),
                 executor=self.executor or TornadoExecutor(),
                 return_promise=True
             )
@@ -296,6 +305,9 @@ class TornadoGraphQLHandler(web.RequestHandler):
             yield middleware
 
     def get_graphql_params(self, request, data):
+        if self.graphql_params:
+            return self.graphql_params
+
         single_args = {}
         for key in request.arguments.keys():
             single_args[key] = self.decode_argument(request.arguments.get(key)[0])
@@ -314,7 +326,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
         if operation_name == "null":
             operation_name = None
 
-        return query, variables, operation_name, id
+        self.graphql_params = query, variables, operation_name, id
+        return self.graphql_params
 
     def handle_error(self, ex):
         if not isinstance(ex, (web.HTTPError, ExecutionError, GraphQLError)):
