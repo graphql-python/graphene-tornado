@@ -9,6 +9,7 @@ from __future__ import absolute_import, print_function
 import sys
 from abc import ABCMeta, abstractmethod
 
+from tornado.gen import coroutine
 from typing import NewType, List, Callable, Optional
 
 EndHandler = NewType('EndHandler', Optional[List[Callable[[List[Exception]], None]]])
@@ -74,13 +75,15 @@ class GraphQLExtension:
         Returns:
             An adapter function
         """
+        @coroutine
         def middleware(next, root, info, **args):
-            end_resolve = self.will_resolve_field(next, root, info, **args)
+            end_resolve = yield self.will_resolve_field(next, root, info, **args)
             errors = []
+            result = None
             try:
                 result = next(root, info, **args)
-                end_resolve([], result)
             except:
                 errors.append(sys.exc_info()[0])
-                end_resolve(errors, None)
+            finally:
+                end_resolve(errors, result)
         return middleware

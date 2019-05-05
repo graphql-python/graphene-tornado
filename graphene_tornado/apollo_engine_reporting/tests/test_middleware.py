@@ -51,6 +51,7 @@ PATHS = []
 
 def middleware(next, root, info, **args):
     PATHS.append(info.path[0])
+    return next(root, info, **args)
 
 
 def test_trace():

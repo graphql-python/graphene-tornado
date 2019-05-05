@@ -1,6 +1,6 @@
+import pytest
 from google.protobuf.json_format import MessageToJson
 from graphql import get_default_backend, parse, build_ast_schema, execute
-from tornado.gen import coroutine
 from tornado.httpserver import HTTPRequest
 
 from graphene_tornado.apollo_engine_reporting.engine_agent import EngineReportingOptions
@@ -118,11 +118,10 @@ QUERY = """
 """
 
 
-@coroutine
+@pytest.mark.gen_test
 def test_trace():
     traces = []
 
-    @coroutine
     def add_trace(signature, operation_name, trace):
         traces.append((signature, operation_name, trace))
 
@@ -149,8 +148,7 @@ def test_trace():
         operation_name='q',
     )
 
-    result = yield execute(schema, document.document_ast, middleware=[stack.as_middleware()],
-                           executor=TornadoExecutor())
+    result = execute(schema, document.document_ast, middleware=[stack.as_middleware()], executor=TornadoExecutor())
 
     assert not result.errors
 
@@ -161,4 +159,5 @@ def test_trace():
 
     assert QUERY == signature
     assert 'q' == operation_name
-    assert expected == MessageToJson(trace, including_default_value_fields=True)
+    trace_json = MessageToJson(trace, including_default_value_fields=True)
+    assert expected == trace_json
