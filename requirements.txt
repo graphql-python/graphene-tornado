@@ -3,4 +3,4 @@ graphene>=2.0.1
 Jinja2>=2.10.1, <2.11.0
 tornado>=5.1.0
 tox
-werkzeug==0.12.2
+werkzeug==0.15.3
