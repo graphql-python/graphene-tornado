@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.2.0
+
+* Added experimental extensions framework
+
 ## 2.1.0
 
 * Upgraded to Graphene 2.1
