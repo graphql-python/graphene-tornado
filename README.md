@@ -54,7 +54,7 @@ async def resolve_foo(self, info):
 
 `graphene-tornado` supports server-side extensions like [Apollo Server](https://www.apollographql.com/docs/apollo-server/features/metrics). The extensions go a step further than Graphene middleware to allow for finer grained interception of request processing. The canonical use case is for tracing; see `graphene_tornado/apollo_engine_reporting/engine_agent.py` for an example.
 
-Extensions are experimental and most likely will change in future releases.
+Extensions are experimental and most likely will change in future releases as they should be extensions provided by `graphql-core`.
 
 # Apollo Engine Reporting
 
