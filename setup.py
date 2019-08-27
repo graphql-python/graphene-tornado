@@ -50,8 +50,8 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
+        'graphene>=2.1,<3',
         'json-stable-stringify-python==0.2',
-        'graphene>=2.1',
         'protobuf>=3.7.1',
         'Jinja2>=2.10.1',
         'tornado>=5.1.0',

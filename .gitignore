@@ -2,6 +2,7 @@
 .idea
 .coverage
 .pytest_cache
+.tox
 
 *.pyc
 
