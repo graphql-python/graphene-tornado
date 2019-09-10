@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.3.0
+
+* Fix for field resolvers in extension framework
+
 # 2.2.0
 
 * Added experimental extensions framework
