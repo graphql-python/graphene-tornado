@@ -6,10 +6,9 @@ Extensions are also middleware but have additional hooks.
 """
 from __future__ import absolute_import, print_function
 
-import sys
 from abc import ABCMeta, abstractmethod
 
-from tornado.gen import coroutine
+from tornado.gen import coroutine, Return
 from typing import NewType, List, Callable, Optional
 
 EndHandler = NewType('EndHandler', Optional[List[Callable[[List[Exception]], None]]])
@@ -54,7 +53,7 @@ class GraphQLExtension:
         pass
 
     @abstractmethod
-    def will_resolve_field(self, next, root, info, **args):
+    def will_resolve_field(self, root, info, **args):
         # type: (...) -> EndHandler
         pass
 
@@ -73,17 +72,16 @@ class GraphQLExtension:
         is invoked like normal middleware
 
         Returns:
-            An adapter function
+            An adapter function that acts as middleware
         """
         @coroutine
         def middleware(next, root, info, **args):
-            end_resolve = yield self.will_resolve_field(next, root, info, **args)
+            end_resolve = yield self.will_resolve_field(root, info, **args)
+            res = None
             errors = []
-            result = None
             try:
-                result = next(root, info, **args)
-            except:
-                errors.append(sys.exc_info()[0])
+                res = next(root, info, **args)
+                raise Return(res)
             finally:
-                end_resolve(errors, result)
+                yield end_resolve(errors, res)
         return middleware

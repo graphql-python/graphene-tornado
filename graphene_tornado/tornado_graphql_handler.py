@@ -61,7 +61,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         middlewares = []
         if extensions:
             self.extension_stack = GraphQLExtensionStack(extensions)
-            middlewares.extend(extensions)
+            middlewares.extend([self.extension_stack.as_middleware()])
 
         if middleware is not None:
             middlewares.extend(list(self.instantiate_middleware(middleware)))
