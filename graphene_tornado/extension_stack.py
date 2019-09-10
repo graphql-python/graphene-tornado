@@ -38,18 +38,17 @@ class GraphQLExtensionStack(GraphQLExtension):
         raise Return(on_end)
 
     @coroutine
-    def will_resolve_field(self, next, root, info, **args):
+    def will_resolve_field(self, root, info, **args):
         ext = self.extensions[:]
         ext.reverse()
 
-        handlers = []
         for extension in self.extensions:
-            handlers.append(extension.will_resolve_field(next, root, info, **args))
+            on_end = yield extension.will_resolve_field(root, info, **args)
+            on_end()
 
         @coroutine
         def on_end(error=None, result=None):
-            for handler in handlers:
-                yield handler(error, result)
+            raise Return((error, result))
 
         raise Return(on_end)
 
