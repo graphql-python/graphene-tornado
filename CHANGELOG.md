@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.4.0
+
+* Adding some tooling for building observability tools ported from apollo-tooling
+
 # 2.3.0
 
 * Fix for field resolvers in extension framework
