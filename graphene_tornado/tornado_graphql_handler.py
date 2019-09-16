@@ -50,10 +50,10 @@ class TornadoGraphQLHandler(web.RequestHandler):
     document = None
     graphql_params = None
     parsed_body = None
-    extension_stack = GraphQLExtensionStack()
+    extension_stack = GraphQLExtensionStack([])
 
     def initialize(self, schema=None, executor=None, middleware=None, root_value=None, graphiql=False, pretty=False,
-                   batch=False, backend=None, extensions=None):
+                   batch=False, backend=None, extensions=None, allow_subscriptions=False):
         super(TornadoGraphQLHandler, self).initialize()
 
         self.schema = schema
@@ -61,7 +61,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         middlewares = []
         if extensions:
             self.extension_stack = GraphQLExtensionStack(extensions)
-            middlewares.extend(extensions)
+            middlewares.extend([self.extension_stack.as_middleware()])
 
         if middleware is not None:
             middlewares.extend(list(self.instantiate_middleware(middleware)))
@@ -75,6 +75,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.graphiql = graphiql
         self.batch = batch
         self.backend = backend or get_default_backend()
+        self.allow_subscriptions = allow_subscriptions
 
     @property
     def context(self):
@@ -295,7 +296,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 context=self.context,
                 middleware=self.get_middleware(),
                 executor=self.executor or TornadoExecutor(),
-                return_promise=True
+                return_promise=True,
+                allow_subscriptions=self.allow_subscriptions
             )
             yield execution_ended()
         except Exception as e:

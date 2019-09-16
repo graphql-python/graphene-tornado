@@ -47,7 +47,7 @@ class TrackingExtension(GraphQLExtension):
         raise Return(partial(_track_closed, phase))
 
     @coroutine
-    def will_resolve_field(self, next, root, info, **args):
+    def will_resolve_field(self, root, info, **args):
         phase = 'resolve_field'
         STARTED.append(phase)
         raise Return(partial(_track_closed, phase))
@@ -91,6 +91,6 @@ def test_extensions_are_called_in_order(http_helper):
         'data': {'test': "Hello Dolly"}
     }
 
-    assert ['request', 'parsing', 'validation', 'execution', 'response'] == STARTED
-    assert ['parsing', 'validation', 'execution', 'request'] == ENDED
+    assert ['request', 'parsing', 'validation', 'execution', 'resolve_field', 'response'] == STARTED
+    assert ['parsing', 'validation', 'resolve_field', 'execution', 'request'] == ENDED
 
