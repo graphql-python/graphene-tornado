@@ -6,14 +6,12 @@ import time
 from numbers import Number
 
 from google.protobuf.timestamp_pb2 import Timestamp
-from graphql import print_ast
-from graphql.language.ast import Document
 from tornado.gen import coroutine, Return
 from tornado.httputil import HTTPServerRequest
 from typing import Callable, NamedTuple
 
-from graphene_tornado.apollo_engine_reporting.engine_agent import EngineReportingOptions
-from graphene_tornado.apollo_engine_reporting.reports_pb2 import Trace
+from graphene_tornado.ext.apollo_engine_reporting.engine_agent import EngineReportingOptions
+from graphene_tornado.ext.apollo_engine_reporting.reports_pb2 import Trace
 from graphene_tornado.graphql_extension import GraphQLExtension
 
 PY37 = sys.version_info[0:2] >= (3, 7)
@@ -40,29 +38,17 @@ def generate_client_info(request):
     )
 
 
-def default_engine_reporting_signature(ast, operation_name):
-    # type: (Document, str) -> str
-    # TODO This is expensive (printing a 2nd time) and not a good signature method
-    return print_ast(ast)
-
-
-def response_path_as_array(path):
-    # TODO Need to figure this out
-    #flattened = []
-    #curr = path
-
-    #while curr:
-    #    flattened.append(curr)
-    #    curr = curr.prev
-    #
-    #return flattened.reverse()
-    return path
-
-
 def response_path_as_string(path):
     if not path:
         return ''
-    return '.'.join(response_path_as_array(path))
+    return '.'.join((str(x) for x in path))
+
+
+def now_ns():
+    if PY37:
+        return time.time_ns()
+
+    return long(time.time() * 1000000000)
 
 
 class EngineReportingExtension(GraphQLExtension):
@@ -77,17 +63,17 @@ class EngineReportingExtension(GraphQLExtension):
         self.options = options  # maskErrorDetails = False
 
         root = Trace.Node()
+        root.start_time = now_ns()
         self.trace = Trace(root=root)
         self.nodes = {response_path_as_string(None): root}
         self.generate_client_info = options.generate_client_info or generate_client_info
         self.resolver_stats = list()
-        self.paths = []
 
     @coroutine
     def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
         self.trace.start_time.GetCurrentTime()
         self.query_string = query_string
-        self.documentAST = parsed_query
+        self.document = parsed_query
         self.trace.http.method = self._get_http_method(request)
 
         client_info = generate_client_info(request)
@@ -104,18 +90,9 @@ class EngineReportingExtension(GraphQLExtension):
             self.trace.duration_ns = now.ToNanoseconds() - start_nanos
             self.trace.end_time.GetCurrentTime()
 
+            op_name = self.operation_name or ''
             self.trace.root.MergeFrom(self.nodes.get(''))
-            yield self.add_trace(signature, self.operation_name, self.trace)
-
-        operation_name = self.operation_name or ''
-        if self.documentAST:
-            calculate_signature = self.options.calculate_signature or default_engine_reporting_signature
-            signature = calculate_signature(self.documentAST, operation_name)
-        elif self.query_string:
-            signature = self.query_string
-        else:
-            # Empty query? Let someone else handle it
-            return lambda x: x
+            yield self.add_trace(op_name, self.document.document_ast, self.query_string, self.trace)
 
         raise Return(on_request_ended)
 
@@ -131,30 +108,33 @@ class EngineReportingExtension(GraphQLExtension):
     def execution_started(self, schema, document, root, context, variables, operation_name):
         if operation_name:
             self.operation_name = operation_name
-        self.documentAST = document
+        self.document = document
 
     @coroutine
-    def will_resolve_field(self, next, root, info, **args):
+    def will_resolve_field(self, root, info, **args):
         if not self.operation_name:
             self.operation_name = '' if not info.operation.name else info.operation.name.value
 
-        node = self._new_node(info.path[0])
+        node = self._new_node(info.path)
+        node.start_time = now_ns()
         node.type = str(info.return_type)
         node.parent_type = str(info.parent_type)
-        node.start_time = self._now_ns()
 
         @coroutine
-        def on_end(errors, result):
-            node.end_time = self._now_ns()
+        def on_end(errors=None, result=None):
+            node.end_time = now_ns()
 
         raise Return(on_end)
 
     @coroutine
     def will_send_response(self, response, context):
+        root = self.nodes.get('', None)
+        root.end_time = now_ns()
+
         if hasattr(response, 'errors'):
             errors = response.errors
             for error in errors:
-                node = self.nodes.get('', None)
+                node = root
                 if hasattr(error, 'path'):
                     specific_node = self.nodes.get(error.path.join('.'))
                     if specific_node:
@@ -179,29 +159,25 @@ class EngineReportingExtension(GraphQLExtension):
 
     def _new_node(self, path):
         node = Trace.Node()
-        if isinstance(path, Number):
-            node.index = path
+
+        id = path[-1]
+        if isinstance(id, Number):
+            node.index = id
         else:
-            node.field_name = path
+            node.response_name = id
 
         self.nodes[response_path_as_string(path)] = node
-        parent_node = self._ensure_parent_node()
-        node = parent_node.child.add(field_name=node.field_name, index=node.index)
-        self.nodes[response_path_as_string(path)] = node
-        self.paths.append(path)
-        return node
+        parent_node = self._ensure_parent_node(path)
+        n = parent_node.child.add()
+        n.MergeFrom(node)
+        self.nodes[response_path_as_string(path)] = n
+        return n
 
-    def _ensure_parent_node(self):
-        prev = '' if len(self.paths) == 0 else self.paths[len(self.paths) - 1]
+    def _ensure_parent_node(self, path):
+        prev = [''] if len(path) == 1 else path[:-1]
         parent_path = response_path_as_string(prev)
         parent_node = self.nodes.get(parent_path, None)
         if parent_node:
             return parent_node
         return self._new_node(prev)
-
-    def _now_ns(self):
-        if PY37:
-            return time.time_ns()
-
-        return long(time.time() * 1000000000)
 

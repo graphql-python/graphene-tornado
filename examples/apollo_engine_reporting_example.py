@@ -2,9 +2,9 @@ import tornado
 from tornado.ioloop import IOLoop
 
 from graphene_tornado.schema import schema
-from graphene_tornado.apollo_engine_reporting.engine_agent import EngineReportingOptions, EngineReportingAgent
-from graphene_tornado.apollo_engine_reporting.engine_extension import EngineReportingExtension
-from graphene_tornado.schema_utils import generate_schema_hash
+from graphene_tornado.ext.apollo_engine_reporting import EngineReportingOptions, EngineReportingAgent
+from graphene_tornado.ext.apollo_engine_reporting.engine_extension import EngineReportingExtension
+from graphene_tornado.ext.apollo_engine_reporting.schema_utils import generate_schema_hash
 from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
 
 engine_options = EngineReportingOptions()

@@ -20,8 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='reports.proto',
   package='mdg.engine.proto',
   syntax='proto3',
-  serialized_options=_b('H\001'),
-  serialized_pb=_b('\n\rreports.proto\x12\x10mdg.engine.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd7\x11\n\x05Trace\x12.\n\nstart_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12,\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x13\n\x0b\x64uration_ns\x18\x0b \x01(\x04\x12>\n\x1aorigin_reported_start_time\x18\x0f \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12<\n\x18origin_reported_end_time\x18\x10 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12#\n\x1borigin_reported_duration_ns\x18\x11 \x01(\x04\x12\x11\n\tsignature\x18\x13 \x01(\t\x12(\n legacy_signature_needs_resigning\x18\x05 \x01(\t\x12\x30\n\x07\x64\x65tails\x18\x06 \x01(\x0b\x32\x1f.mdg.engine.proto.Trace.Details\x12\x13\n\x0b\x63lient_name\x18\x07 \x01(\t\x12\x16\n\x0e\x63lient_version\x18\x08 \x01(\t\x12\x16\n\x0e\x63lient_address\x18\t \x01(\t\x12\x1b\n\x13\x63lient_reference_id\x18\x17 \x01(\t\x12*\n\x04http\x18\n \x01(\x0b\x32\x1c.mdg.engine.proto.Trace.HTTP\x12\x39\n\x0c\x63\x61\x63he_policy\x18\x12 \x01(\x0b\x32#.mdg.engine.proto.Trace.CachePolicy\x12*\n\x04root\x18\x0e \x01(\x0b\x32\x1c.mdg.engine.proto.Trace.Node\x12\x1c\n\x14\x66ull_query_cache_hit\x18\x14 \x01(\x08\x12\x1b\n\x13persisted_query_hit\x18\x15 \x01(\x08\x12 \n\x18persisted_query_register\x18\x16 \x01(\x08\x1a\x8a\x01\n\x0b\x43\x61\x63hePolicy\x12\x38\n\x05scope\x18\x01 \x01(\x0e\x32).mdg.engine.proto.Trace.CachePolicy.Scope\x12\x12\n\nmax_age_ns\x18\x02 \x01(\x03\"-\n\x05Scope\x12\x0b\n\x07UNKNOWN\x10\x00\x12\n\n\x06PUBLIC\x10\x01\x12\x0b\n\x07PRIVATE\x10\x02\x1a\xab\x02\n\x07\x44\x65tails\x12J\n\x0evariables_json\x18\x04 \x03(\x0b\x32\x32.mdg.engine.proto.Trace.Details.VariablesJsonEntry\x12\x41\n\tvariables\x18\x01 \x03(\x0b\x32..mdg.engine.proto.Trace.Details.VariablesEntry\x12\x11\n\traw_query\x18\x02 \x01(\t\x12\x16\n\x0eoperation_name\x18\x03 \x01(\t\x1a\x34\n\x12VariablesJsonEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x30\n\x0eVariablesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\x1ak\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x32\n\x08location\x18\x02 \x03(\x0b\x32 .mdg.engine.proto.Trace.Location\x12\x0f\n\x07time_ns\x18\x03 \x01(\x04\x12\x0c\n\x04json\x18\x04 \x01(\t\x1a\xf1\x04\n\x04HTTP\x12\x33\n\x06method\x18\x01 \x01(\x0e\x32#.mdg.engine.proto.Trace.HTTP.Method\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04path\x18\x03 \x01(\t\x12I\n\x0frequest_headers\x18\x04 \x03(\x0b\x32\x30.mdg.engine.proto.Trace.HTTP.RequestHeadersEntry\x12K\n\x10response_headers\x18\x05 \x03(\x0b\x32\x31.mdg.engine.proto.Trace.HTTP.ResponseHeadersEntry\x12\x13\n\x0bstatus_code\x18\x06 \x01(\r\x12\x0e\n\x06secure\x18\x08 \x01(\x08\x12\x10\n\x08protocol\x18\t \x01(\t\x1a\x17\n\x06Values\x12\r\n\x05value\x18\x01 \x03(\t\x1aZ\n\x13RequestHeadersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x32\n\x05value\x18\x02 \x01(\x0b\x32#.mdg.engine.proto.Trace.HTTP.Values:\x02\x38\x01\x1a[\n\x14ResponseHeadersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x32\n\x05value\x18\x02 \x01(\x0b\x32#.mdg.engine.proto.Trace.HTTP.Values:\x02\x38\x01\"w\n\x06Method\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07OPTIONS\x10\x01\x12\x07\n\x03GET\x10\x02\x12\x08\n\x04HEAD\x10\x03\x12\x08\n\x04POST\x10\x04\x12\x07\n\x03PUT\x10\x05\x12\n\n\x06\x44\x45LETE\x10\x06\x12\t\n\x05TRACE\x10\x07\x12\x0b\n\x07\x43ONNECT\x10\x08\x12\t\n\x05PATCH\x10\t\x1a(\n\x08Location\x12\x0c\n\x04line\x18\x01 \x01(\r\x12\x0e\n\x06\x63olumn\x18\x02 \x01(\r\x1a\x98\x02\n\x04Node\x12\x14\n\nfield_name\x18\x01 \x01(\tH\x00\x12\x0f\n\x05index\x18\x02 \x01(\rH\x00\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x13\n\x0bparent_type\x18\r \x01(\t\x12\x39\n\x0c\x63\x61\x63he_policy\x18\x05 \x01(\x0b\x32#.mdg.engine.proto.Trace.CachePolicy\x12\x12\n\nstart_time\x18\x08 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\t \x01(\x04\x12,\n\x05\x65rror\x18\x0b \x03(\x0b\x32\x1d.mdg.engine.proto.Trace.Error\x12+\n\x05\x63hild\x18\x0c \x03(\x0b\x32\x1c.mdg.engine.proto.Trace.NodeB\x04\n\x02idJ\x04\x08\x04\x10\x05J\x04\x08\x0c\x10\rJ\x04\x08\r\x10\x0eJ\x04\x08\x01\x10\x02J\x04\x08\x02\x10\x03\"\xb2\x01\n\x0cReportHeader\x12\x0f\n\x07service\x18\x03 \x01(\t\x12\x10\n\x08hostname\x18\x05 \x01(\t\x12\x15\n\ragent_version\x18\x06 \x01(\t\x12\x17\n\x0fservice_version\x18\x07 \x01(\t\x12\x17\n\x0fruntime_version\x18\x08 \x01(\t\x12\r\n\x05uname\x18\t \x01(\t\x12\x12\n\nschema_tag\x18\n \x01(\t\x12\x13\n\x0bschema_hash\x18\x0b \x01(\t\"\xdf\x01\n\x0ePathErrorStats\x12@\n\x08\x63hildren\x18\x01 \x03(\x0b\x32..mdg.engine.proto.PathErrorStats.ChildrenEntry\x12\x14\n\x0c\x65rrors_count\x18\x04 \x01(\x04\x12\"\n\x1arequests_with_errors_count\x18\x05 \x01(\x04\x1aQ\n\rChildrenEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12/\n\x05value\x18\x02 \x01(\x0b\x32 .mdg.engine.proto.PathErrorStats:\x02\x38\x01\"\x96\x07\n\x0f\x43lientNameStats\x12\x15\n\rlatency_count\x18\x01 \x03(\x03\x12\x62\n\x1arequests_count_per_version\x18\x03 \x03(\x0b\x32>.mdg.engine.proto.ClientNameStats.RequestsCountPerVersionEntry\x12Z\n\x16\x63\x61\x63he_hits_per_version\x18\x04 \x03(\x0b\x32:.mdg.engine.proto.ClientNameStats.CacheHitsPerVersionEntry\x12m\n persisted_query_hits_per_version\x18\n \x03(\x0b\x32\x43.mdg.engine.proto.ClientNameStats.PersistedQueryHitsPerVersionEntry\x12q\n\"persisted_query_misses_per_version\x18\x0b \x03(\x0b\x32\x45.mdg.engine.proto.ClientNameStats.PersistedQueryMissesPerVersionEntry\x12\x1b\n\x13\x63\x61\x63he_latency_count\x18\x05 \x03(\x03\x12:\n\x10root_error_stats\x18\x06 \x01(\x0b\x32 .mdg.engine.proto.PathErrorStats\x12\"\n\x1arequests_with_errors_count\x18\x07 \x01(\x04\x12\x1e\n\x16public_cache_ttl_count\x18\x08 \x03(\x03\x12\x1f\n\x17private_cache_ttl_count\x18\t \x03(\x03\x1a>\n\x1cRequestsCountPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1a:\n\x18\x43\x61\x63heHitsPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1a\x43\n!PersistedQueryHitsPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1a\x45\n#PersistedQueryMissesPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01J\x04\x08\x02\x10\x03\"\xd1\x02\n\x11QueryLatencyStats\x12\x15\n\rlatency_count\x18\x01 \x03(\x03\x12\x15\n\rrequest_count\x18\x02 \x01(\x04\x12\x12\n\ncache_hits\x18\x03 \x01(\x04\x12\x1c\n\x14persisted_query_hits\x18\x04 \x01(\x04\x12\x1e\n\x16persisted_query_misses\x18\x05 \x01(\x04\x12\x1b\n\x13\x63\x61\x63he_latency_count\x18\x06 \x03(\x03\x12:\n\x10root_error_stats\x18\x07 \x01(\x0b\x32 .mdg.engine.proto.PathErrorStats\x12\"\n\x1arequests_with_errors_count\x18\x08 \x01(\x04\x12\x1e\n\x16public_cache_ttl_count\x18\t \x03(\x03\x12\x1f\n\x17private_cache_ttl_count\x18\n \x03(\x03\"X\n\x0cStatsContext\x12\x1b\n\x13\x63lient_reference_id\x18\x01 \x01(\t\x12\x13\n\x0b\x63lient_name\x18\x02 \x01(\t\x12\x16\n\x0e\x63lient_version\x18\x03 \x01(\t\"\x94\x01\n\x1f\x43ontextualizedQueryLatencyStats\x12@\n\x13query_latency_stats\x18\x01 \x01(\x0b\x32#.mdg.engine.proto.QueryLatencyStats\x12/\n\x07\x63ontext\x18\x02 \x01(\x0b\x32\x1e.mdg.engine.proto.StatsContext\"\xed\x01\n\x17\x43ontextualizedTypeStats\x12/\n\x07\x63ontext\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.StatsContext\x12Q\n\rper_type_stat\x18\x02 \x03(\x0b\x32:.mdg.engine.proto.ContextualizedTypeStats.PerTypeStatEntry\x1aN\n\x10PerTypeStatEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12)\n\x05value\x18\x02 \x01(\x0b\x32\x1a.mdg.engine.proto.TypeStat:\x02\x38\x01\"\x8e\x01\n\tFieldStat\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0breturn_type\x18\x03 \x01(\t\x12\x14\n\x0c\x65rrors_count\x18\x04 \x01(\x04\x12\r\n\x05\x63ount\x18\x05 \x01(\x04\x12\"\n\x1arequests_with_errors_count\x18\x06 \x01(\x04\x12\x15\n\rlatency_count\x18\x08 \x03(\x03\"\xdc\x01\n\x08TypeStat\x12\x0c\n\x04name\x18\x01 \x01(\t\x12*\n\x05\x66ield\x18\x02 \x03(\x0b\x32\x1b.mdg.engine.proto.FieldStat\x12\x44\n\x0eper_field_stat\x18\x03 \x03(\x0b\x32,.mdg.engine.proto.TypeStat.PerFieldStatEntry\x1aP\n\x11PerFieldStatEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12*\n\x05value\x18\x02 \x01(\x0b\x32\x1b.mdg.engine.proto.FieldStat:\x02\x38\x01\"\x94\x04\n\nQueryStats\x12H\n\x0fper_client_name\x18\x01 \x03(\x0b\x32/.mdg.engine.proto.QueryStats.PerClientNameEntry\x12S\n\x18query_stats_with_context\x18\x04 \x03(\x0b\x32\x31.mdg.engine.proto.ContextualizedQueryLatencyStats\x12,\n\x08per_type\x18\x02 \x03(\x0b\x32\x1a.mdg.engine.proto.TypeStat\x12\x44\n\rper_type_stat\x18\x03 \x03(\x0b\x32-.mdg.engine.proto.QueryStats.PerTypeStatEntry\x12J\n\x17type_stats_with_context\x18\x05 \x03(\x0b\x32).mdg.engine.proto.ContextualizedTypeStats\x1aW\n\x12PerClientNameEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.mdg.engine.proto.ClientNameStats:\x02\x38\x01\x1aN\n\x10PerTypeStatEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12)\n\x05value\x18\x02 \x01(\x0b\x32\x1a.mdg.engine.proto.TypeStat:\x02\x38\x01\"f\n\x0cTracesReport\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12&\n\x05trace\x18\x02 \x03(\x0b\x32\x17.mdg.engine.proto.Trace\"*\n\x05\x46ield\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0breturn_type\x18\x03 \x01(\t\"<\n\x04Type\x12\x0c\n\x04name\x18\x01 \x01(\t\x12&\n\x05\x66ield\x18\x02 \x03(\x0b\x32\x17.mdg.engine.proto.Field\"\xf5\x02\n\x08MemStats\x12\x13\n\x0btotal_bytes\x18\x01 \x01(\x04\x12\x13\n\x0bstack_bytes\x18\x02 \x01(\x04\x12\x12\n\nheap_bytes\x18\x03 \x01(\x04\x12\x1b\n\x13heap_released_bytes\x18\r \x01(\x04\x12\x19\n\x11gc_overhead_bytes\x18\x04 \x01(\x04\x12\x18\n\x10stack_used_bytes\x18\x05 \x01(\x04\x12\x1c\n\x14heap_allocated_bytes\x18\x06 \x01(\x04\x12\x1e\n\x16heap_allocated_objects\x18\x07 \x01(\x04\x12\"\n\x1aheap_allocated_bytes_delta\x18\x08 \x01(\x04\x12$\n\x1cheap_allocated_objects_delta\x18\t \x01(\x04\x12 \n\x18heap_freed_objects_delta\x18\n \x01(\x04\x12\x17\n\x0fgc_stw_ns_delta\x18\x0b \x01(\x04\x12\x16\n\x0egc_count_delta\x18\x0c \x01(\x04\"b\n\tTimeStats\x12\x11\n\tuptime_ns\x18\x01 \x01(\x04\x12\x15\n\rreal_ns_delta\x18\x02 \x01(\x04\x12\x15\n\ruser_ns_delta\x18\x03 \x01(\x04\x12\x14\n\x0csys_ns_delta\x18\x04 \x01(\x04\"\xaf\x05\n\x0bStatsReport\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12-\n\tmem_stats\x18\x02 \x01(\x0b\x32\x1a.mdg.engine.proto.MemStats\x12/\n\ntime_stats\x18\x03 \x01(\x0b\x32\x1b.mdg.engine.proto.TimeStats\x12.\n\nstart_time\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12,\n\x08\x65nd_time\x18\t \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x19\n\x11realtime_duration\x18\n \x01(\x04\x12>\n\tper_query\x18\x0e \x03(\x0b\x32+.mdg.engine.proto.StatsReport.PerQueryEntry\x12x\n(legacy_per_query_implicit_operation_name\x18\x0c \x03(\x0b\x32\x46.mdg.engine.proto.StatsReport.LegacyPerQueryImplicitOperationNameEntry\x12$\n\x04type\x18\r \x03(\x0b\x32\x16.mdg.engine.proto.Type\x1aM\n\rPerQueryEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12+\n\x05value\x18\x02 \x01(\x0b\x32\x1c.mdg.engine.proto.QueryStats:\x02\x38\x01\x1ah\n(LegacyPerQueryImplicitOperationNameEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12+\n\x05value\x18\x02 \x01(\x0b\x32\x1c.mdg.engine.proto.QueryStats:\x02\x38\x01\"\xe5\x01\n\x10\x46ullTracesReport\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12P\n\x10traces_per_query\x18\x05 \x03(\x0b\x32\x36.mdg.engine.proto.FullTracesReport.TracesPerQueryEntry\x1aO\n\x13TracesPerQueryEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\'\n\x05value\x18\x02 \x01(\x0b\x32\x18.mdg.engine.proto.Traces:\x02\x38\x01\"0\n\x06Traces\x12&\n\x05trace\x18\x01 \x03(\x0b\x32\x17.mdg.engine.proto.TraceB\x02H\x01\x62\x06proto3')
+  serialized_options=None,
+  serialized_pb=_b('\n\rreports.proto\x12\x10mdg.engine.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe9\x19\n\x05Trace\x12.\n\nstart_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12,\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x13\n\x0b\x64uration_ns\x18\x0b \x01(\x04\x12*\n\x04root\x18\x0e \x01(\x0b\x32\x1c.mdg.engine.proto.Trace.Node\x12\x11\n\tsignature\x18\x13 \x01(\t\x12\x30\n\x07\x64\x65tails\x18\x06 \x01(\x0b\x32\x1f.mdg.engine.proto.Trace.Details\x12\x13\n\x0b\x63lient_name\x18\x07 \x01(\t\x12\x16\n\x0e\x63lient_version\x18\x08 \x01(\t\x12\x16\n\x0e\x63lient_address\x18\t \x01(\t\x12\x1b\n\x13\x63lient_reference_id\x18\x17 \x01(\t\x12*\n\x04http\x18\n \x01(\x0b\x32\x1c.mdg.engine.proto.Trace.HTTP\x12\x39\n\x0c\x63\x61\x63he_policy\x18\x12 \x01(\x0b\x32#.mdg.engine.proto.Trace.CachePolicy\x12\x39\n\nquery_plan\x18\x1a \x01(\x0b\x32%.mdg.engine.proto.Trace.QueryPlanNode\x12\x1c\n\x14\x66ull_query_cache_hit\x18\x14 \x01(\x08\x12\x1b\n\x13persisted_query_hit\x18\x15 \x01(\x08\x12 \n\x18persisted_query_register\x18\x16 \x01(\x08\x12\x1c\n\x14registered_operation\x18\x18 \x01(\x08\x12\x1b\n\x13\x66orbidden_operation\x18\x19 \x01(\x08\x12>\n\x1aorigin_reported_start_time\x18\x0f \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12<\n\x18origin_reported_end_time\x18\x10 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12#\n\x1borigin_reported_duration_ns\x18\x11 \x01(\x04\x12(\n legacy_signature_needs_resigning\x18\x05 \x01(\t\x1a\x8a\x01\n\x0b\x43\x61\x63hePolicy\x12\x38\n\x05scope\x18\x01 \x01(\x0e\x32).mdg.engine.proto.Trace.CachePolicy.Scope\x12\x12\n\nmax_age_ns\x18\x02 \x01(\x03\"-\n\x05Scope\x12\x0b\n\x07UNKNOWN\x10\x00\x12\n\n\x06PUBLIC\x10\x01\x12\x0b\n\x07PRIVATE\x10\x02\x1a\xab\x02\n\x07\x44\x65tails\x12J\n\x0evariables_json\x18\x04 \x03(\x0b\x32\x32.mdg.engine.proto.Trace.Details.VariablesJsonEntry\x12\x41\n\tvariables\x18\x01 \x03(\x0b\x32..mdg.engine.proto.Trace.Details.VariablesEntry\x12\x11\n\traw_query\x18\x02 \x01(\t\x12\x16\n\x0eoperation_name\x18\x03 \x01(\t\x1a\x34\n\x12VariablesJsonEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x30\n\x0eVariablesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\x1ak\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x32\n\x08location\x18\x02 \x03(\x0b\x32 .mdg.engine.proto.Trace.Location\x12\x0f\n\x07time_ns\x18\x03 \x01(\x04\x12\x0c\n\x04json\x18\x04 \x01(\t\x1a\xf1\x04\n\x04HTTP\x12\x33\n\x06method\x18\x01 \x01(\x0e\x32#.mdg.engine.proto.Trace.HTTP.Method\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04path\x18\x03 \x01(\t\x12I\n\x0frequest_headers\x18\x04 \x03(\x0b\x32\x30.mdg.engine.proto.Trace.HTTP.RequestHeadersEntry\x12K\n\x10response_headers\x18\x05 \x03(\x0b\x32\x31.mdg.engine.proto.Trace.HTTP.ResponseHeadersEntry\x12\x13\n\x0bstatus_code\x18\x06 \x01(\r\x12\x0e\n\x06secure\x18\x08 \x01(\x08\x12\x10\n\x08protocol\x18\t \x01(\t\x1a\x17\n\x06Values\x12\r\n\x05value\x18\x01 \x03(\t\x1aZ\n\x13RequestHeadersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x32\n\x05value\x18\x02 \x01(\x0b\x32#.mdg.engine.proto.Trace.HTTP.Values:\x02\x38\x01\x1a[\n\x14ResponseHeadersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x32\n\x05value\x18\x02 \x01(\x0b\x32#.mdg.engine.proto.Trace.HTTP.Values:\x02\x38\x01\"w\n\x06Method\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07OPTIONS\x10\x01\x12\x07\n\x03GET\x10\x02\x12\x08\n\x04HEAD\x10\x03\x12\x08\n\x04POST\x10\x04\x12\x07\n\x03PUT\x10\x05\x12\n\n\x06\x44\x45LETE\x10\x06\x12\t\n\x05TRACE\x10\x07\x12\x0b\n\x07\x43ONNECT\x10\x08\x12\t\n\x05PATCH\x10\t\x1a(\n\x08Location\x12\x0c\n\x04line\x18\x01 \x01(\r\x12\x0e\n\x06\x63olumn\x18\x02 \x01(\r\x1a\xb8\x02\n\x04Node\x12\x17\n\rresponse_name\x18\x01 \x01(\tH\x00\x12\x0f\n\x05index\x18\x02 \x01(\rH\x00\x12\x1b\n\x13original_field_name\x18\x0e \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x13\n\x0bparent_type\x18\r \x01(\t\x12\x39\n\x0c\x63\x61\x63he_policy\x18\x05 \x01(\x0b\x32#.mdg.engine.proto.Trace.CachePolicy\x12\x12\n\nstart_time\x18\x08 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\t \x01(\x04\x12,\n\x05\x65rror\x18\x0b \x03(\x0b\x32\x1d.mdg.engine.proto.Trace.Error\x12+\n\x05\x63hild\x18\x0c \x03(\x0b\x32\x1c.mdg.engine.proto.Trace.NodeB\x04\n\x02idJ\x04\x08\x04\x10\x05\x1a\xf9\x06\n\rQueryPlanNode\x12\x46\n\x08sequence\x18\x01 \x01(\x0b\x32\x32.mdg.engine.proto.Trace.QueryPlanNode.SequenceNodeH\x00\x12\x46\n\x08parallel\x18\x02 \x01(\x0b\x32\x32.mdg.engine.proto.Trace.QueryPlanNode.ParallelNodeH\x00\x12@\n\x05\x66\x65tch\x18\x03 \x01(\x0b\x32/.mdg.engine.proto.Trace.QueryPlanNode.FetchNodeH\x00\x12\x44\n\x07\x66latten\x18\x04 \x01(\x0b\x32\x31.mdg.engine.proto.Trace.QueryPlanNode.FlattenNodeH\x00\x1a\x44\n\x0cSequenceNode\x12\x34\n\x05nodes\x18\x01 \x03(\x0b\x32%.mdg.engine.proto.Trace.QueryPlanNode\x1a\x44\n\x0cParallelNode\x12\x34\n\x05nodes\x18\x01 \x03(\x0b\x32%.mdg.engine.proto.Trace.QueryPlanNode\x1a\xe0\x01\n\tFetchNode\x12\x13\n\x0bserviceName\x18\x01 \x01(\t\x12\x1a\n\x12traceParsingFailed\x18\x02 \x01(\x08\x12&\n\x05trace\x18\x03 \x01(\x0b\x32\x17.mdg.engine.proto.Trace\x12\x18\n\x10sent_time_offset\x18\x04 \x01(\x04\x12-\n\tsent_time\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x31\n\rreceived_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1a\x94\x01\n\x0b\x46lattenNode\x12P\n\rresponse_path\x18\x01 \x03(\x0b\x32\x39.mdg.engine.proto.Trace.QueryPlanNode.ResponsePathElement\x12\x33\n\x04node\x18\x02 \x01(\x0b\x32%.mdg.engine.proto.Trace.QueryPlanNode\x1a\x42\n\x13ResponsePathElement\x12\x14\n\nfield_name\x18\x01 \x01(\tH\x00\x12\x0f\n\x05index\x18\x02 \x01(\rH\x00\x42\x04\n\x02idB\x06\n\x04nodeJ\x04\x08\x0c\x10\rJ\x04\x08\r\x10\x0eJ\x04\x08\x01\x10\x02J\x04\x08\x02\x10\x03\"\xb2\x01\n\x0cReportHeader\x12\x0f\n\x07service\x18\x03 \x01(\t\x12\x10\n\x08hostname\x18\x05 \x01(\t\x12\x15\n\ragent_version\x18\x06 \x01(\t\x12\x17\n\x0fservice_version\x18\x07 \x01(\t\x12\x17\n\x0fruntime_version\x18\x08 \x01(\t\x12\r\n\x05uname\x18\t \x01(\t\x12\x12\n\nschema_tag\x18\n \x01(\t\x12\x13\n\x0bschema_hash\x18\x0b \x01(\t\"\xdf\x01\n\x0ePathErrorStats\x12@\n\x08\x63hildren\x18\x01 \x03(\x0b\x32..mdg.engine.proto.PathErrorStats.ChildrenEntry\x12\x14\n\x0c\x65rrors_count\x18\x04 \x01(\x04\x12\"\n\x1arequests_with_errors_count\x18\x05 \x01(\x04\x1aQ\n\rChildrenEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12/\n\x05value\x18\x02 \x01(\x0b\x32 .mdg.engine.proto.PathErrorStats:\x02\x38\x01\"\x9f\n\n\x0f\x43lientNameStats\x12\x15\n\rlatency_count\x18\x01 \x03(\x03\x12\x62\n\x1arequests_count_per_version\x18\x03 \x03(\x0b\x32>.mdg.engine.proto.ClientNameStats.RequestsCountPerVersionEntry\x12Z\n\x16\x63\x61\x63he_hits_per_version\x18\x04 \x03(\x0b\x32:.mdg.engine.proto.ClientNameStats.CacheHitsPerVersionEntry\x12m\n persisted_query_hits_per_version\x18\n \x03(\x0b\x32\x43.mdg.engine.proto.ClientNameStats.PersistedQueryHitsPerVersionEntry\x12q\n\"persisted_query_misses_per_version\x18\x0b \x03(\x0b\x32\x45.mdg.engine.proto.ClientNameStats.PersistedQueryMissesPerVersionEntry\x12y\n&registered_operation_count_per_version\x18\x0c \x03(\x0b\x32I.mdg.engine.proto.ClientNameStats.RegisteredOperationCountPerVersionEntry\x12w\n%forbidden_operation_count_per_version\x18\r \x03(\x0b\x32H.mdg.engine.proto.ClientNameStats.ForbiddenOperationCountPerVersionEntry\x12\x1b\n\x13\x63\x61\x63he_latency_count\x18\x05 \x03(\x03\x12:\n\x10root_error_stats\x18\x06 \x01(\x0b\x32 .mdg.engine.proto.PathErrorStats\x12\"\n\x1arequests_with_errors_count\x18\x07 \x01(\x04\x12\x1e\n\x16public_cache_ttl_count\x18\x08 \x03(\x03\x12\x1f\n\x17private_cache_ttl_count\x18\t \x03(\x03\x1a>\n\x1cRequestsCountPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1a:\n\x18\x43\x61\x63heHitsPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1a\x43\n!PersistedQueryHitsPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1a\x45\n#PersistedQueryMissesPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1aI\n\'RegisteredOperationCountPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01\x1aH\n&ForbiddenOperationCountPerVersionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x04:\x02\x38\x01J\x04\x08\x02\x10\x03\"\x98\x03\n\x11QueryLatencyStats\x12\x15\n\rlatency_count\x18\x01 \x03(\x03\x12\x15\n\rrequest_count\x18\x02 \x01(\x04\x12\x12\n\ncache_hits\x18\x03 \x01(\x04\x12\x1c\n\x14persisted_query_hits\x18\x04 \x01(\x04\x12\x1e\n\x16persisted_query_misses\x18\x05 \x01(\x04\x12\x1b\n\x13\x63\x61\x63he_latency_count\x18\x06 \x03(\x03\x12:\n\x10root_error_stats\x18\x07 \x01(\x0b\x32 .mdg.engine.proto.PathErrorStats\x12\"\n\x1arequests_with_errors_count\x18\x08 \x01(\x04\x12\x1e\n\x16public_cache_ttl_count\x18\t \x03(\x03\x12\x1f\n\x17private_cache_ttl_count\x18\n \x03(\x03\x12\"\n\x1aregistered_operation_count\x18\x0b \x01(\x04\x12!\n\x19\x66orbidden_operation_count\x18\x0c \x01(\x04\"X\n\x0cStatsContext\x12\x1b\n\x13\x63lient_reference_id\x18\x01 \x01(\t\x12\x13\n\x0b\x63lient_name\x18\x02 \x01(\t\x12\x16\n\x0e\x63lient_version\x18\x03 \x01(\t\"\x94\x01\n\x1f\x43ontextualizedQueryLatencyStats\x12@\n\x13query_latency_stats\x18\x01 \x01(\x0b\x32#.mdg.engine.proto.QueryLatencyStats\x12/\n\x07\x63ontext\x18\x02 \x01(\x0b\x32\x1e.mdg.engine.proto.StatsContext\"\xed\x01\n\x17\x43ontextualizedTypeStats\x12/\n\x07\x63ontext\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.StatsContext\x12Q\n\rper_type_stat\x18\x02 \x03(\x0b\x32:.mdg.engine.proto.ContextualizedTypeStats.PerTypeStatEntry\x1aN\n\x10PerTypeStatEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12)\n\x05value\x18\x02 \x01(\x0b\x32\x1a.mdg.engine.proto.TypeStat:\x02\x38\x01\"\x8e\x01\n\tFieldStat\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0breturn_type\x18\x03 \x01(\t\x12\x14\n\x0c\x65rrors_count\x18\x04 \x01(\x04\x12\r\n\x05\x63ount\x18\x05 \x01(\x04\x12\"\n\x1arequests_with_errors_count\x18\x06 \x01(\x04\x12\x15\n\rlatency_count\x18\x08 \x03(\x03\"\xdc\x01\n\x08TypeStat\x12\x0c\n\x04name\x18\x01 \x01(\t\x12*\n\x05\x66ield\x18\x02 \x03(\x0b\x32\x1b.mdg.engine.proto.FieldStat\x12\x44\n\x0eper_field_stat\x18\x03 \x03(\x0b\x32,.mdg.engine.proto.TypeStat.PerFieldStatEntry\x1aP\n\x11PerFieldStatEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12*\n\x05value\x18\x02 \x01(\x0b\x32\x1b.mdg.engine.proto.FieldStat:\x02\x38\x01\"\x94\x04\n\nQueryStats\x12H\n\x0fper_client_name\x18\x01 \x03(\x0b\x32/.mdg.engine.proto.QueryStats.PerClientNameEntry\x12S\n\x18query_stats_with_context\x18\x04 \x03(\x0b\x32\x31.mdg.engine.proto.ContextualizedQueryLatencyStats\x12,\n\x08per_type\x18\x02 \x03(\x0b\x32\x1a.mdg.engine.proto.TypeStat\x12\x44\n\rper_type_stat\x18\x03 \x03(\x0b\x32-.mdg.engine.proto.QueryStats.PerTypeStatEntry\x12J\n\x17type_stats_with_context\x18\x05 \x03(\x0b\x32).mdg.engine.proto.ContextualizedTypeStats\x1aW\n\x12PerClientNameEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.mdg.engine.proto.ClientNameStats:\x02\x38\x01\x1aN\n\x10PerTypeStatEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12)\n\x05value\x18\x02 \x01(\x0b\x32\x1a.mdg.engine.proto.TypeStat:\x02\x38\x01\"f\n\x0cTracesReport\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12&\n\x05trace\x18\x02 \x03(\x0b\x32\x17.mdg.engine.proto.Trace\"*\n\x05\x46ield\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0breturn_type\x18\x03 \x01(\t\"<\n\x04Type\x12\x0c\n\x04name\x18\x01 \x01(\t\x12&\n\x05\x66ield\x18\x02 \x03(\x0b\x32\x17.mdg.engine.proto.Field\"\xf5\x02\n\x08MemStats\x12\x13\n\x0btotal_bytes\x18\x01 \x01(\x04\x12\x13\n\x0bstack_bytes\x18\x02 \x01(\x04\x12\x12\n\nheap_bytes\x18\x03 \x01(\x04\x12\x1b\n\x13heap_released_bytes\x18\r \x01(\x04\x12\x19\n\x11gc_overhead_bytes\x18\x04 \x01(\x04\x12\x18\n\x10stack_used_bytes\x18\x05 \x01(\x04\x12\x1c\n\x14heap_allocated_bytes\x18\x06 \x01(\x04\x12\x1e\n\x16heap_allocated_objects\x18\x07 \x01(\x04\x12\"\n\x1aheap_allocated_bytes_delta\x18\x08 \x01(\x04\x12$\n\x1cheap_allocated_objects_delta\x18\t \x01(\x04\x12 \n\x18heap_freed_objects_delta\x18\n \x01(\x04\x12\x17\n\x0fgc_stw_ns_delta\x18\x0b \x01(\x04\x12\x16\n\x0egc_count_delta\x18\x0c \x01(\x04\"b\n\tTimeStats\x12\x11\n\tuptime_ns\x18\x01 \x01(\x04\x12\x15\n\rreal_ns_delta\x18\x02 \x01(\x04\x12\x15\n\ruser_ns_delta\x18\x03 \x01(\x04\x12\x14\n\x0csys_ns_delta\x18\x04 \x01(\x04\"\xaf\x05\n\x0bStatsReport\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12-\n\tmem_stats\x18\x02 \x01(\x0b\x32\x1a.mdg.engine.proto.MemStats\x12/\n\ntime_stats\x18\x03 \x01(\x0b\x32\x1b.mdg.engine.proto.TimeStats\x12.\n\nstart_time\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12,\n\x08\x65nd_time\x18\t \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x19\n\x11realtime_duration\x18\n \x01(\x04\x12>\n\tper_query\x18\x0e \x03(\x0b\x32+.mdg.engine.proto.StatsReport.PerQueryEntry\x12x\n(legacy_per_query_implicit_operation_name\x18\x0c \x03(\x0b\x32\x46.mdg.engine.proto.StatsReport.LegacyPerQueryImplicitOperationNameEntry\x12$\n\x04type\x18\r \x03(\x0b\x32\x16.mdg.engine.proto.Type\x1aM\n\rPerQueryEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12+\n\x05value\x18\x02 \x01(\x0b\x32\x1c.mdg.engine.proto.QueryStats:\x02\x38\x01\x1ah\n(LegacyPerQueryImplicitOperationNameEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12+\n\x05value\x18\x02 \x01(\x0b\x32\x1c.mdg.engine.proto.QueryStats:\x02\x38\x01\"\xe5\x01\n\x10\x46ullTracesReport\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12P\n\x10traces_per_query\x18\x05 \x03(\x0b\x32\x36.mdg.engine.proto.FullTracesReport.TracesPerQueryEntry\x1aO\n\x13TracesPerQueryEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\'\n\x05value\x18\x02 \x01(\x0b\x32\x18.mdg.engine.proto.Traces:\x02\x38\x01\"0\n\x06Traces\x12&\n\x05trace\x18\x01 \x03(\x0b\x32\x17.mdg.engine.proto.Trace\"a\n\x07TraceV1\x12.\n\x06header\x18\x01 \x01(\x0b\x32\x1e.mdg.engine.proto.ReportHeader\x12&\n\x05trace\x18\x02 \x01(\x0b\x32\x17.mdg.engine.proto.Traceb\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -48,8 +48,8 @@ _TRACE_CACHEPOLICY_SCOPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=899,
-  serialized_end=944,
+  serialized_start=1017,
+  serialized_end=1062,
 )
 _sym_db.RegisterEnumDescriptor(_TRACE_CACHEPOLICY_SCOPE)
 
@@ -102,8 +102,8 @@ _TRACE_HTTP_METHOD = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1864,
-  serialized_end=1983,
+  serialized_start=1982,
+  serialized_end=2101,
 )
 _sym_db.RegisterEnumDescriptor(_TRACE_HTTP_METHOD)
 
@@ -142,8 +142,8 @@ _TRACE_CACHEPOLICY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=806,
-  serialized_end=944,
+  serialized_start=924,
+  serialized_end=1062,
 )
 
 _TRACE_DETAILS_VARIABLESJSONENTRY = _descriptor.Descriptor(
@@ -179,8 +179,8 @@ _TRACE_DETAILS_VARIABLESJSONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1144,
-  serialized_end=1196,
+  serialized_start=1262,
+  serialized_end=1314,
 )
 
 _TRACE_DETAILS_VARIABLESENTRY = _descriptor.Descriptor(
@@ -216,8 +216,8 @@ _TRACE_DETAILS_VARIABLESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1198,
-  serialized_end=1246,
+  serialized_start=1316,
+  serialized_end=1364,
 )
 
 _TRACE_DETAILS = _descriptor.Descriptor(
@@ -267,8 +267,8 @@ _TRACE_DETAILS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=947,
-  serialized_end=1246,
+  serialized_start=1065,
+  serialized_end=1364,
 )
 
 _TRACE_ERROR = _descriptor.Descriptor(
@@ -318,8 +318,8 @@ _TRACE_ERROR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1248,
-  serialized_end=1355,
+  serialized_start=1366,
+  serialized_end=1473,
 )
 
 _TRACE_HTTP_VALUES = _descriptor.Descriptor(
@@ -348,8 +348,8 @@ _TRACE_HTTP_VALUES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1654,
-  serialized_end=1677,
+  serialized_start=1772,
+  serialized_end=1795,
 )
 
 _TRACE_HTTP_REQUESTHEADERSENTRY = _descriptor.Descriptor(
@@ -385,8 +385,8 @@ _TRACE_HTTP_REQUESTHEADERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1679,
-  serialized_end=1769,
+  serialized_start=1797,
+  serialized_end=1887,
 )
 
 _TRACE_HTTP_RESPONSEHEADERSENTRY = _descriptor.Descriptor(
@@ -422,8 +422,8 @@ _TRACE_HTTP_RESPONSEHEADERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1771,
-  serialized_end=1862,
+  serialized_start=1889,
+  serialized_end=1980,
 )
 
 _TRACE_HTTP = _descriptor.Descriptor(
@@ -502,8 +502,8 @@ _TRACE_HTTP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1358,
-  serialized_end=1983,
+  serialized_start=1476,
+  serialized_end=2101,
 )
 
 _TRACE_LOCATION = _descriptor.Descriptor(
@@ -539,8 +539,8 @@ _TRACE_LOCATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1985,
-  serialized_end=2025,
+  serialized_start=2103,
+  serialized_end=2143,
 )
 
 _TRACE_NODE = _descriptor.Descriptor(
@@ -551,7 +551,7 @@ _TRACE_NODE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='field_name', full_name='mdg.engine.proto.Trace.Node.field_name', index=0,
+      name='response_name', full_name='mdg.engine.proto.Trace.Node.response_name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -565,49 +565,56 @@ _TRACE_NODE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='type', full_name='mdg.engine.proto.Trace.Node.type', index=2,
+      name='original_field_name', full_name='mdg.engine.proto.Trace.Node.original_field_name', index=2,
+      number=14, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='mdg.engine.proto.Trace.Node.type', index=3,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='parent_type', full_name='mdg.engine.proto.Trace.Node.parent_type', index=3,
+      name='parent_type', full_name='mdg.engine.proto.Trace.Node.parent_type', index=4,
       number=13, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='cache_policy', full_name='mdg.engine.proto.Trace.Node.cache_policy', index=4,
+      name='cache_policy', full_name='mdg.engine.proto.Trace.Node.cache_policy', index=5,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='start_time', full_name='mdg.engine.proto.Trace.Node.start_time', index=5,
+      name='start_time', full_name='mdg.engine.proto.Trace.Node.start_time', index=6,
       number=8, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='end_time', full_name='mdg.engine.proto.Trace.Node.end_time', index=6,
+      name='end_time', full_name='mdg.engine.proto.Trace.Node.end_time', index=7,
       number=9, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='error', full_name='mdg.engine.proto.Trace.Node.error', index=7,
+      name='error', full_name='mdg.engine.proto.Trace.Node.error', index=8,
       number=11, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='child', full_name='mdg.engine.proto.Trace.Node.child', index=8,
+      name='child', full_name='mdg.engine.proto.Trace.Node.child', index=9,
       number=12, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -628,8 +635,264 @@ _TRACE_NODE = _descriptor.Descriptor(
       name='id', full_name='mdg.engine.proto.Trace.Node.id',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=2028,
-  serialized_end=2308,
+  serialized_start=2146,
+  serialized_end=2458,
+)
+
+_TRACE_QUERYPLANNODE_SEQUENCENODE = _descriptor.Descriptor(
+  name='SequenceNode',
+  full_name='mdg.engine.proto.Trace.QueryPlanNode.SequenceNode',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='nodes', full_name='mdg.engine.proto.Trace.QueryPlanNode.SequenceNode.nodes', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2758,
+  serialized_end=2826,
+)
+
+_TRACE_QUERYPLANNODE_PARALLELNODE = _descriptor.Descriptor(
+  name='ParallelNode',
+  full_name='mdg.engine.proto.Trace.QueryPlanNode.ParallelNode',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='nodes', full_name='mdg.engine.proto.Trace.QueryPlanNode.ParallelNode.nodes', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2828,
+  serialized_end=2896,
+)
+
+_TRACE_QUERYPLANNODE_FETCHNODE = _descriptor.Descriptor(
+  name='FetchNode',
+  full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='serviceName', full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode.serviceName', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='traceParsingFailed', full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode.traceParsingFailed', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='trace', full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode.trace', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sent_time_offset', full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode.sent_time_offset', index=3,
+      number=4, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sent_time', full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode.sent_time', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='received_time', full_name='mdg.engine.proto.Trace.QueryPlanNode.FetchNode.received_time', index=5,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2899,
+  serialized_end=3123,
+)
+
+_TRACE_QUERYPLANNODE_FLATTENNODE = _descriptor.Descriptor(
+  name='FlattenNode',
+  full_name='mdg.engine.proto.Trace.QueryPlanNode.FlattenNode',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='response_path', full_name='mdg.engine.proto.Trace.QueryPlanNode.FlattenNode.response_path', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='node', full_name='mdg.engine.proto.Trace.QueryPlanNode.FlattenNode.node', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=3126,
+  serialized_end=3274,
+)
+
+_TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT = _descriptor.Descriptor(
+  name='ResponsePathElement',
+  full_name='mdg.engine.proto.Trace.QueryPlanNode.ResponsePathElement',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='field_name', full_name='mdg.engine.proto.Trace.QueryPlanNode.ResponsePathElement.field_name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='index', full_name='mdg.engine.proto.Trace.QueryPlanNode.ResponsePathElement.index', index=1,
+      number=2, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='id', full_name='mdg.engine.proto.Trace.QueryPlanNode.ResponsePathElement.id',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=3276,
+  serialized_end=3342,
+)
+
+_TRACE_QUERYPLANNODE = _descriptor.Descriptor(
+  name='QueryPlanNode',
+  full_name='mdg.engine.proto.Trace.QueryPlanNode',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='sequence', full_name='mdg.engine.proto.Trace.QueryPlanNode.sequence', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='parallel', full_name='mdg.engine.proto.Trace.QueryPlanNode.parallel', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='fetch', full_name='mdg.engine.proto.Trace.QueryPlanNode.fetch', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='flatten', full_name='mdg.engine.proto.Trace.QueryPlanNode.flatten', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_TRACE_QUERYPLANNODE_SEQUENCENODE, _TRACE_QUERYPLANNODE_PARALLELNODE, _TRACE_QUERYPLANNODE_FETCHNODE, _TRACE_QUERYPLANNODE_FLATTENNODE, _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='node', full_name='mdg.engine.proto.Trace.QueryPlanNode.node',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=2461,
+  serialized_end=3350,
 )
 
 _TRACE = _descriptor.Descriptor(
@@ -661,121 +924,142 @@ _TRACE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='origin_reported_start_time', full_name='mdg.engine.proto.Trace.origin_reported_start_time', index=3,
-      number=15, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='origin_reported_end_time', full_name='mdg.engine.proto.Trace.origin_reported_end_time', index=4,
-      number=16, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='origin_reported_duration_ns', full_name='mdg.engine.proto.Trace.origin_reported_duration_ns', index=5,
-      number=17, type=4, cpp_type=4, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='signature', full_name='mdg.engine.proto.Trace.signature', index=6,
-      number=19, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='legacy_signature_needs_resigning', full_name='mdg.engine.proto.Trace.legacy_signature_needs_resigning', index=7,
-      number=5, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='details', full_name='mdg.engine.proto.Trace.details', index=8,
-      number=6, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='client_name', full_name='mdg.engine.proto.Trace.client_name', index=9,
-      number=7, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='client_version', full_name='mdg.engine.proto.Trace.client_version', index=10,
-      number=8, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='client_address', full_name='mdg.engine.proto.Trace.client_address', index=11,
-      number=9, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='client_reference_id', full_name='mdg.engine.proto.Trace.client_reference_id', index=12,
-      number=23, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='http', full_name='mdg.engine.proto.Trace.http', index=13,
-      number=10, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='cache_policy', full_name='mdg.engine.proto.Trace.cache_policy', index=14,
-      number=18, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='root', full_name='mdg.engine.proto.Trace.root', index=15,
+      name='root', full_name='mdg.engine.proto.Trace.root', index=3,
       number=14, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='full_query_cache_hit', full_name='mdg.engine.proto.Trace.full_query_cache_hit', index=16,
+      name='signature', full_name='mdg.engine.proto.Trace.signature', index=4,
+      number=19, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='details', full_name='mdg.engine.proto.Trace.details', index=5,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='client_name', full_name='mdg.engine.proto.Trace.client_name', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='client_version', full_name='mdg.engine.proto.Trace.client_version', index=7,
+      number=8, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='client_address', full_name='mdg.engine.proto.Trace.client_address', index=8,
+      number=9, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='client_reference_id', full_name='mdg.engine.proto.Trace.client_reference_id', index=9,
+      number=23, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='http', full_name='mdg.engine.proto.Trace.http', index=10,
+      number=10, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cache_policy', full_name='mdg.engine.proto.Trace.cache_policy', index=11,
+      number=18, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='query_plan', full_name='mdg.engine.proto.Trace.query_plan', index=12,
+      number=26, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='full_query_cache_hit', full_name='mdg.engine.proto.Trace.full_query_cache_hit', index=13,
       number=20, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='persisted_query_hit', full_name='mdg.engine.proto.Trace.persisted_query_hit', index=17,
+      name='persisted_query_hit', full_name='mdg.engine.proto.Trace.persisted_query_hit', index=14,
       number=21, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='persisted_query_register', full_name='mdg.engine.proto.Trace.persisted_query_register', index=18,
+      name='persisted_query_register', full_name='mdg.engine.proto.Trace.persisted_query_register', index=15,
       number=22, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='registered_operation', full_name='mdg.engine.proto.Trace.registered_operation', index=16,
+      number=24, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='forbidden_operation', full_name='mdg.engine.proto.Trace.forbidden_operation', index=17,
+      number=25, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='origin_reported_start_time', full_name='mdg.engine.proto.Trace.origin_reported_start_time', index=18,
+      number=15, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='origin_reported_end_time', full_name='mdg.engine.proto.Trace.origin_reported_end_time', index=19,
+      number=16, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='origin_reported_duration_ns', full_name='mdg.engine.proto.Trace.origin_reported_duration_ns', index=20,
+      number=17, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='legacy_signature_needs_resigning', full_name='mdg.engine.proto.Trace.legacy_signature_needs_resigning', index=21,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
-  nested_types=[_TRACE_CACHEPOLICY, _TRACE_DETAILS, _TRACE_ERROR, _TRACE_HTTP, _TRACE_LOCATION, _TRACE_NODE, ],
+  nested_types=[_TRACE_CACHEPOLICY, _TRACE_DETAILS, _TRACE_ERROR, _TRACE_HTTP, _TRACE_LOCATION, _TRACE_NODE, _TRACE_QUERYPLANNODE, ],
   enum_types=[
   ],
   serialized_options=None,
@@ -785,7 +1069,7 @@ _TRACE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=69,
-  serialized_end=2332,
+  serialized_end=3374,
 )
 
 
@@ -864,8 +1148,8 @@ _REPORTHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2335,
-  serialized_end=2513,
+  serialized_start=3377,
+  serialized_end=3555,
 )
 
 
@@ -902,8 +1186,8 @@ _PATHERRORSTATS_CHILDRENENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2658,
-  serialized_end=2739,
+  serialized_start=3700,
+  serialized_end=3781,
 )
 
 _PATHERRORSTATS = _descriptor.Descriptor(
@@ -946,8 +1230,8 @@ _PATHERRORSTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2516,
-  serialized_end=2739,
+  serialized_start=3558,
+  serialized_end=3781,
 )
 
 
@@ -984,8 +1268,8 @@ _CLIENTNAMESTATS_REQUESTSCOUNTPERVERSIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3392,
-  serialized_end=3454,
+  serialized_start=4678,
+  serialized_end=4740,
 )
 
 _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY = _descriptor.Descriptor(
@@ -1021,8 +1305,8 @@ _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3456,
-  serialized_end=3514,
+  serialized_start=4742,
+  serialized_end=4800,
 )
 
 _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY = _descriptor.Descriptor(
@@ -1058,8 +1342,8 @@ _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3516,
-  serialized_end=3583,
+  serialized_start=4802,
+  serialized_end=4869,
 )
 
 _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY = _descriptor.Descriptor(
@@ -1095,8 +1379,82 @@ _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3585,
-  serialized_end=3654,
+  serialized_start=4871,
+  serialized_end=4940,
+)
+
+_CLIENTNAMESTATS_REGISTEREDOPERATIONCOUNTPERVERSIONENTRY = _descriptor.Descriptor(
+  name='RegisteredOperationCountPerVersionEntry',
+  full_name='mdg.engine.proto.ClientNameStats.RegisteredOperationCountPerVersionEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='mdg.engine.proto.ClientNameStats.RegisteredOperationCountPerVersionEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='mdg.engine.proto.ClientNameStats.RegisteredOperationCountPerVersionEntry.value', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=_b('8\001'),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4942,
+  serialized_end=5015,
+)
+
+_CLIENTNAMESTATS_FORBIDDENOPERATIONCOUNTPERVERSIONENTRY = _descriptor.Descriptor(
+  name='ForbiddenOperationCountPerVersionEntry',
+  full_name='mdg.engine.proto.ClientNameStats.ForbiddenOperationCountPerVersionEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='mdg.engine.proto.ClientNameStats.ForbiddenOperationCountPerVersionEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='mdg.engine.proto.ClientNameStats.ForbiddenOperationCountPerVersionEntry.value', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=_b('8\001'),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=5017,
+  serialized_end=5089,
 )
 
 _CLIENTNAMESTATS = _descriptor.Descriptor(
@@ -1142,35 +1500,49 @@ _CLIENTNAMESTATS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='cache_latency_count', full_name='mdg.engine.proto.ClientNameStats.cache_latency_count', index=5,
+      name='registered_operation_count_per_version', full_name='mdg.engine.proto.ClientNameStats.registered_operation_count_per_version', index=5,
+      number=12, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='forbidden_operation_count_per_version', full_name='mdg.engine.proto.ClientNameStats.forbidden_operation_count_per_version', index=6,
+      number=13, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cache_latency_count', full_name='mdg.engine.proto.ClientNameStats.cache_latency_count', index=7,
       number=5, type=3, cpp_type=2, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='root_error_stats', full_name='mdg.engine.proto.ClientNameStats.root_error_stats', index=6,
+      name='root_error_stats', full_name='mdg.engine.proto.ClientNameStats.root_error_stats', index=8,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='requests_with_errors_count', full_name='mdg.engine.proto.ClientNameStats.requests_with_errors_count', index=7,
+      name='requests_with_errors_count', full_name='mdg.engine.proto.ClientNameStats.requests_with_errors_count', index=9,
       number=7, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='public_cache_ttl_count', full_name='mdg.engine.proto.ClientNameStats.public_cache_ttl_count', index=8,
+      name='public_cache_ttl_count', full_name='mdg.engine.proto.ClientNameStats.public_cache_ttl_count', index=10,
       number=8, type=3, cpp_type=2, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='private_cache_ttl_count', full_name='mdg.engine.proto.ClientNameStats.private_cache_ttl_count', index=9,
+      name='private_cache_ttl_count', full_name='mdg.engine.proto.ClientNameStats.private_cache_ttl_count', index=11,
       number=9, type=3, cpp_type=2, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1179,7 +1551,7 @@ _CLIENTNAMESTATS = _descriptor.Descriptor(
   ],
   extensions=[
   ],
-  nested_types=[_CLIENTNAMESTATS_REQUESTSCOUNTPERVERSIONENTRY, _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY, _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY, _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY, ],
+  nested_types=[_CLIENTNAMESTATS_REQUESTSCOUNTPERVERSIONENTRY, _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY, _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY, _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY, _CLIENTNAMESTATS_REGISTEREDOPERATIONCOUNTPERVERSIONENTRY, _CLIENTNAMESTATS_FORBIDDENOPERATIONCOUNTPERVERSIONENTRY, ],
   enum_types=[
   ],
   serialized_options=None,
@@ -1188,8 +1560,8 @@ _CLIENTNAMESTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2742,
-  serialized_end=3660,
+  serialized_start=3784,
+  serialized_end=5095,
 )
 
 
@@ -1270,6 +1642,20 @@ _QUERYLATENCYSTATS = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='registered_operation_count', full_name='mdg.engine.proto.QueryLatencyStats.registered_operation_count', index=10,
+      number=11, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='forbidden_operation_count', full_name='mdg.engine.proto.QueryLatencyStats.forbidden_operation_count', index=11,
+      number=12, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -1282,8 +1668,8 @@ _QUERYLATENCYSTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3663,
-  serialized_end=4000,
+  serialized_start=5098,
+  serialized_end=5506,
 )
 
 
@@ -1327,8 +1713,8 @@ _STATSCONTEXT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4002,
-  serialized_end=4090,
+  serialized_start=5508,
+  serialized_end=5596,
 )
 
 
@@ -1365,8 +1751,8 @@ _CONTEXTUALIZEDQUERYLATENCYSTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4093,
-  serialized_end=4241,
+  serialized_start=5599,
+  serialized_end=5747,
 )
 
 
@@ -1403,8 +1789,8 @@ _CONTEXTUALIZEDTYPESTATS_PERTYPESTATENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4403,
-  serialized_end=4481,
+  serialized_start=5909,
+  serialized_end=5987,
 )
 
 _CONTEXTUALIZEDTYPESTATS = _descriptor.Descriptor(
@@ -1440,8 +1826,8 @@ _CONTEXTUALIZEDTYPESTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4244,
-  serialized_end=4481,
+  serialized_start=5750,
+  serialized_end=5987,
 )
 
 
@@ -1506,8 +1892,8 @@ _FIELDSTAT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4484,
-  serialized_end=4626,
+  serialized_start=5990,
+  serialized_end=6132,
 )
 
 
@@ -1544,8 +1930,8 @@ _TYPESTAT_PERFIELDSTATENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4769,
-  serialized_end=4849,
+  serialized_start=6275,
+  serialized_end=6355,
 )
 
 _TYPESTAT = _descriptor.Descriptor(
@@ -1588,8 +1974,8 @@ _TYPESTAT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4629,
-  serialized_end=4849,
+  serialized_start=6135,
+  serialized_end=6355,
 )
 
 
@@ -1626,8 +2012,8 @@ _QUERYSTATS_PERCLIENTNAMEENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5217,
-  serialized_end=5304,
+  serialized_start=6723,
+  serialized_end=6810,
 )
 
 _QUERYSTATS_PERTYPESTATENTRY = _descriptor.Descriptor(
@@ -1663,8 +2049,8 @@ _QUERYSTATS_PERTYPESTATENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4403,
-  serialized_end=4481,
+  serialized_start=5909,
+  serialized_end=5987,
 )
 
 _QUERYSTATS = _descriptor.Descriptor(
@@ -1721,8 +2107,8 @@ _QUERYSTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4852,
-  serialized_end=5384,
+  serialized_start=6358,
+  serialized_end=6890,
 )
 
 
@@ -1759,8 +2145,8 @@ _TRACESREPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5386,
-  serialized_end=5488,
+  serialized_start=6892,
+  serialized_end=6994,
 )
 
 
@@ -1797,8 +2183,8 @@ _FIELD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5490,
-  serialized_end=5532,
+  serialized_start=6996,
+  serialized_end=7038,
 )
 
 
@@ -1835,8 +2221,8 @@ _TYPE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5534,
-  serialized_end=5594,
+  serialized_start=7040,
+  serialized_end=7100,
 )
 
 
@@ -1950,8 +2336,8 @@ _MEMSTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5597,
-  serialized_end=5970,
+  serialized_start=7103,
+  serialized_end=7476,
 )
 
 
@@ -2002,8 +2388,8 @@ _TIMESTATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5972,
-  serialized_end=6070,
+  serialized_start=7478,
+  serialized_end=7576,
 )
 
 
@@ -2040,8 +2426,8 @@ _STATSREPORT_PERQUERYENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6577,
-  serialized_end=6654,
+  serialized_start=8083,
+  serialized_end=8160,
 )
 
 _STATSREPORT_LEGACYPERQUERYIMPLICITOPERATIONNAMEENTRY = _descriptor.Descriptor(
@@ -2077,8 +2463,8 @@ _STATSREPORT_LEGACYPERQUERYIMPLICITOPERATIONNAMEENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6656,
-  serialized_end=6760,
+  serialized_start=8162,
+  serialized_end=8266,
 )
 
 _STATSREPORT = _descriptor.Descriptor(
@@ -2163,8 +2549,8 @@ _STATSREPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6073,
-  serialized_end=6760,
+  serialized_start=7579,
+  serialized_end=8266,
 )
 
 
@@ -2201,8 +2587,8 @@ _FULLTRACESREPORT_TRACESPERQUERYENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6913,
-  serialized_end=6992,
+  serialized_start=8419,
+  serialized_end=8498,
 )
 
 _FULLTRACESREPORT = _descriptor.Descriptor(
@@ -2238,8 +2624,8 @@ _FULLTRACESREPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6763,
-  serialized_end=6992,
+  serialized_start=8269,
+  serialized_end=8498,
 )
 
 
@@ -2269,8 +2655,46 @@ _TRACES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6994,
-  serialized_end=7042,
+  serialized_start=8500,
+  serialized_end=8548,
+)
+
+
+_TRACEV1 = _descriptor.Descriptor(
+  name='TraceV1',
+  full_name='mdg.engine.proto.TraceV1',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='header', full_name='mdg.engine.proto.TraceV1.header', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='trace', full_name='mdg.engine.proto.TraceV1.trace', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=8550,
+  serialized_end=8647,
 )
 
 _TRACE_CACHEPOLICY.fields_by_name['scope'].enum_type = _TRACE_CACHEPOLICY_SCOPE
@@ -2299,19 +2723,55 @@ _TRACE_NODE.fields_by_name['error'].message_type = _TRACE_ERROR
 _TRACE_NODE.fields_by_name['child'].message_type = _TRACE_NODE
 _TRACE_NODE.containing_type = _TRACE
 _TRACE_NODE.oneofs_by_name['id'].fields.append(
-  _TRACE_NODE.fields_by_name['field_name'])
-_TRACE_NODE.fields_by_name['field_name'].containing_oneof = _TRACE_NODE.oneofs_by_name['id']
+  _TRACE_NODE.fields_by_name['response_name'])
+_TRACE_NODE.fields_by_name['response_name'].containing_oneof = _TRACE_NODE.oneofs_by_name['id']
 _TRACE_NODE.oneofs_by_name['id'].fields.append(
   _TRACE_NODE.fields_by_name['index'])
 _TRACE_NODE.fields_by_name['index'].containing_oneof = _TRACE_NODE.oneofs_by_name['id']
+_TRACE_QUERYPLANNODE_SEQUENCENODE.fields_by_name['nodes'].message_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_SEQUENCENODE.containing_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_PARALLELNODE.fields_by_name['nodes'].message_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_PARALLELNODE.containing_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_FETCHNODE.fields_by_name['trace'].message_type = _TRACE
+_TRACE_QUERYPLANNODE_FETCHNODE.fields_by_name['sent_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_TRACE_QUERYPLANNODE_FETCHNODE.fields_by_name['received_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_TRACE_QUERYPLANNODE_FETCHNODE.containing_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_FLATTENNODE.fields_by_name['response_path'].message_type = _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT
+_TRACE_QUERYPLANNODE_FLATTENNODE.fields_by_name['node'].message_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_FLATTENNODE.containing_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.containing_type = _TRACE_QUERYPLANNODE
+_TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.oneofs_by_name['id'].fields.append(
+  _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.fields_by_name['field_name'])
+_TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.fields_by_name['field_name'].containing_oneof = _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.oneofs_by_name['id']
+_TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.oneofs_by_name['id'].fields.append(
+  _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.fields_by_name['index'])
+_TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.fields_by_name['index'].containing_oneof = _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT.oneofs_by_name['id']
+_TRACE_QUERYPLANNODE.fields_by_name['sequence'].message_type = _TRACE_QUERYPLANNODE_SEQUENCENODE
+_TRACE_QUERYPLANNODE.fields_by_name['parallel'].message_type = _TRACE_QUERYPLANNODE_PARALLELNODE
+_TRACE_QUERYPLANNODE.fields_by_name['fetch'].message_type = _TRACE_QUERYPLANNODE_FETCHNODE
+_TRACE_QUERYPLANNODE.fields_by_name['flatten'].message_type = _TRACE_QUERYPLANNODE_FLATTENNODE
+_TRACE_QUERYPLANNODE.containing_type = _TRACE
+_TRACE_QUERYPLANNODE.oneofs_by_name['node'].fields.append(
+  _TRACE_QUERYPLANNODE.fields_by_name['sequence'])
+_TRACE_QUERYPLANNODE.fields_by_name['sequence'].containing_oneof = _TRACE_QUERYPLANNODE.oneofs_by_name['node']
+_TRACE_QUERYPLANNODE.oneofs_by_name['node'].fields.append(
+  _TRACE_QUERYPLANNODE.fields_by_name['parallel'])
+_TRACE_QUERYPLANNODE.fields_by_name['parallel'].containing_oneof = _TRACE_QUERYPLANNODE.oneofs_by_name['node']
+_TRACE_QUERYPLANNODE.oneofs_by_name['node'].fields.append(
+  _TRACE_QUERYPLANNODE.fields_by_name['fetch'])
+_TRACE_QUERYPLANNODE.fields_by_name['fetch'].containing_oneof = _TRACE_QUERYPLANNODE.oneofs_by_name['node']
+_TRACE_QUERYPLANNODE.oneofs_by_name['node'].fields.append(
+  _TRACE_QUERYPLANNODE.fields_by_name['flatten'])
+_TRACE_QUERYPLANNODE.fields_by_name['flatten'].containing_oneof = _TRACE_QUERYPLANNODE.oneofs_by_name['node']
 _TRACE.fields_by_name['start_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _TRACE.fields_by_name['end_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
-_TRACE.fields_by_name['origin_reported_start_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
-_TRACE.fields_by_name['origin_reported_end_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_TRACE.fields_by_name['root'].message_type = _TRACE_NODE
 _TRACE.fields_by_name['details'].message_type = _TRACE_DETAILS
 _TRACE.fields_by_name['http'].message_type = _TRACE_HTTP
 _TRACE.fields_by_name['cache_policy'].message_type = _TRACE_CACHEPOLICY
-_TRACE.fields_by_name['root'].message_type = _TRACE_NODE
+_TRACE.fields_by_name['query_plan'].message_type = _TRACE_QUERYPLANNODE
+_TRACE.fields_by_name['origin_reported_start_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_TRACE.fields_by_name['origin_reported_end_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _PATHERRORSTATS_CHILDRENENTRY.fields_by_name['value'].message_type = _PATHERRORSTATS
 _PATHERRORSTATS_CHILDRENENTRY.containing_type = _PATHERRORSTATS
 _PATHERRORSTATS.fields_by_name['children'].message_type = _PATHERRORSTATS_CHILDRENENTRY
@@ -2319,10 +2779,14 @@ _CLIENTNAMESTATS_REQUESTSCOUNTPERVERSIONENTRY.containing_type = _CLIENTNAMESTATS
 _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY.containing_type = _CLIENTNAMESTATS
 _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY.containing_type = _CLIENTNAMESTATS
 _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY.containing_type = _CLIENTNAMESTATS
+_CLIENTNAMESTATS_REGISTEREDOPERATIONCOUNTPERVERSIONENTRY.containing_type = _CLIENTNAMESTATS
+_CLIENTNAMESTATS_FORBIDDENOPERATIONCOUNTPERVERSIONENTRY.containing_type = _CLIENTNAMESTATS
 _CLIENTNAMESTATS.fields_by_name['requests_count_per_version'].message_type = _CLIENTNAMESTATS_REQUESTSCOUNTPERVERSIONENTRY
 _CLIENTNAMESTATS.fields_by_name['cache_hits_per_version'].message_type = _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY
 _CLIENTNAMESTATS.fields_by_name['persisted_query_hits_per_version'].message_type = _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY
 _CLIENTNAMESTATS.fields_by_name['persisted_query_misses_per_version'].message_type = _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY
+_CLIENTNAMESTATS.fields_by_name['registered_operation_count_per_version'].message_type = _CLIENTNAMESTATS_REGISTEREDOPERATIONCOUNTPERVERSIONENTRY
+_CLIENTNAMESTATS.fields_by_name['forbidden_operation_count_per_version'].message_type = _CLIENTNAMESTATS_FORBIDDENOPERATIONCOUNTPERVERSIONENTRY
 _CLIENTNAMESTATS.fields_by_name['root_error_stats'].message_type = _PATHERRORSTATS
 _QUERYLATENCYSTATS.fields_by_name['root_error_stats'].message_type = _PATHERRORSTATS
 _CONTEXTUALIZEDQUERYLATENCYSTATS.fields_by_name['query_latency_stats'].message_type = _QUERYLATENCYSTATS
@@ -2364,6 +2828,8 @@ _FULLTRACESREPORT_TRACESPERQUERYENTRY.containing_type = _FULLTRACESREPORT
 _FULLTRACESREPORT.fields_by_name['header'].message_type = _REPORTHEADER
 _FULLTRACESREPORT.fields_by_name['traces_per_query'].message_type = _FULLTRACESREPORT_TRACESPERQUERYENTRY
 _TRACES.fields_by_name['trace'].message_type = _TRACE
+_TRACEV1.fields_by_name['header'].message_type = _REPORTHEADER
+_TRACEV1.fields_by_name['trace'].message_type = _TRACE
 DESCRIPTOR.message_types_by_name['Trace'] = _TRACE
 DESCRIPTOR.message_types_by_name['ReportHeader'] = _REPORTHEADER
 DESCRIPTOR.message_types_by_name['PathErrorStats'] = _PATHERRORSTATS
@@ -2383,6 +2849,7 @@ DESCRIPTOR.message_types_by_name['TimeStats'] = _TIMESTATS
 DESCRIPTOR.message_types_by_name['StatsReport'] = _STATSREPORT
 DESCRIPTOR.message_types_by_name['FullTracesReport'] = _FULLTRACESREPORT
 DESCRIPTOR.message_types_by_name['Traces'] = _TRACES
+DESCRIPTOR.message_types_by_name['TraceV1'] = _TRACEV1
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Trace = _reflection.GeneratedProtocolMessageType('Trace', (_message.Message,), dict(
@@ -2463,6 +2930,48 @@ Trace = _reflection.GeneratedProtocolMessageType('Trace', (_message.Message,), d
     # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.Node)
     ))
   ,
+
+  QueryPlanNode = _reflection.GeneratedProtocolMessageType('QueryPlanNode', (_message.Message,), dict(
+
+    SequenceNode = _reflection.GeneratedProtocolMessageType('SequenceNode', (_message.Message,), dict(
+      DESCRIPTOR = _TRACE_QUERYPLANNODE_SEQUENCENODE,
+      __module__ = 'reports_pb2'
+      # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.QueryPlanNode.SequenceNode)
+      ))
+    ,
+
+    ParallelNode = _reflection.GeneratedProtocolMessageType('ParallelNode', (_message.Message,), dict(
+      DESCRIPTOR = _TRACE_QUERYPLANNODE_PARALLELNODE,
+      __module__ = 'reports_pb2'
+      # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.QueryPlanNode.ParallelNode)
+      ))
+    ,
+
+    FetchNode = _reflection.GeneratedProtocolMessageType('FetchNode', (_message.Message,), dict(
+      DESCRIPTOR = _TRACE_QUERYPLANNODE_FETCHNODE,
+      __module__ = 'reports_pb2'
+      # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.QueryPlanNode.FetchNode)
+      ))
+    ,
+
+    FlattenNode = _reflection.GeneratedProtocolMessageType('FlattenNode', (_message.Message,), dict(
+      DESCRIPTOR = _TRACE_QUERYPLANNODE_FLATTENNODE,
+      __module__ = 'reports_pb2'
+      # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.QueryPlanNode.FlattenNode)
+      ))
+    ,
+
+    ResponsePathElement = _reflection.GeneratedProtocolMessageType('ResponsePathElement', (_message.Message,), dict(
+      DESCRIPTOR = _TRACE_QUERYPLANNODE_RESPONSEPATHELEMENT,
+      __module__ = 'reports_pb2'
+      # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.QueryPlanNode.ResponsePathElement)
+      ))
+    ,
+    DESCRIPTOR = _TRACE_QUERYPLANNODE,
+    __module__ = 'reports_pb2'
+    # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace.QueryPlanNode)
+    ))
+  ,
   DESCRIPTOR = _TRACE,
   __module__ = 'reports_pb2'
   # @@protoc_insertion_point(class_scope:mdg.engine.proto.Trace)
@@ -2479,6 +2988,12 @@ _sym_db.RegisterMessage(Trace.HTTP.RequestHeadersEntry)
 _sym_db.RegisterMessage(Trace.HTTP.ResponseHeadersEntry)
 _sym_db.RegisterMessage(Trace.Location)
 _sym_db.RegisterMessage(Trace.Node)
+_sym_db.RegisterMessage(Trace.QueryPlanNode)
+_sym_db.RegisterMessage(Trace.QueryPlanNode.SequenceNode)
+_sym_db.RegisterMessage(Trace.QueryPlanNode.ParallelNode)
+_sym_db.RegisterMessage(Trace.QueryPlanNode.FetchNode)
+_sym_db.RegisterMessage(Trace.QueryPlanNode.FlattenNode)
+_sym_db.RegisterMessage(Trace.QueryPlanNode.ResponsePathElement)
 
 ReportHeader = _reflection.GeneratedProtocolMessageType('ReportHeader', (_message.Message,), dict(
   DESCRIPTOR = _REPORTHEADER,
@@ -2531,6 +3046,20 @@ ClientNameStats = _reflection.GeneratedProtocolMessageType('ClientNameStats', (_
     # @@protoc_insertion_point(class_scope:mdg.engine.proto.ClientNameStats.PersistedQueryMissesPerVersionEntry)
     ))
   ,
+
+  RegisteredOperationCountPerVersionEntry = _reflection.GeneratedProtocolMessageType('RegisteredOperationCountPerVersionEntry', (_message.Message,), dict(
+    DESCRIPTOR = _CLIENTNAMESTATS_REGISTEREDOPERATIONCOUNTPERVERSIONENTRY,
+    __module__ = 'reports_pb2'
+    # @@protoc_insertion_point(class_scope:mdg.engine.proto.ClientNameStats.RegisteredOperationCountPerVersionEntry)
+    ))
+  ,
+
+  ForbiddenOperationCountPerVersionEntry = _reflection.GeneratedProtocolMessageType('ForbiddenOperationCountPerVersionEntry', (_message.Message,), dict(
+    DESCRIPTOR = _CLIENTNAMESTATS_FORBIDDENOPERATIONCOUNTPERVERSIONENTRY,
+    __module__ = 'reports_pb2'
+    # @@protoc_insertion_point(class_scope:mdg.engine.proto.ClientNameStats.ForbiddenOperationCountPerVersionEntry)
+    ))
+  ,
   DESCRIPTOR = _CLIENTNAMESTATS,
   __module__ = 'reports_pb2'
   # @@protoc_insertion_point(class_scope:mdg.engine.proto.ClientNameStats)
@@ -2540,6 +3069,8 @@ _sym_db.RegisterMessage(ClientNameStats.RequestsCountPerVersionEntry)
 _sym_db.RegisterMessage(ClientNameStats.CacheHitsPerVersionEntry)
 _sym_db.RegisterMessage(ClientNameStats.PersistedQueryHitsPerVersionEntry)
 _sym_db.RegisterMessage(ClientNameStats.PersistedQueryMissesPerVersionEntry)
+_sym_db.RegisterMessage(ClientNameStats.RegisteredOperationCountPerVersionEntry)
+_sym_db.RegisterMessage(ClientNameStats.ForbiddenOperationCountPerVersionEntry)
 
 QueryLatencyStats = _reflection.GeneratedProtocolMessageType('QueryLatencyStats', (_message.Message,), dict(
   DESCRIPTOR = _QUERYLATENCYSTATS,
@@ -2702,8 +3233,14 @@ Traces = _reflection.GeneratedProtocolMessageType('Traces', (_message.Message,),
   ))
 _sym_db.RegisterMessage(Traces)
 
+TraceV1 = _reflection.GeneratedProtocolMessageType('TraceV1', (_message.Message,), dict(
+  DESCRIPTOR = _TRACEV1,
+  __module__ = 'reports_pb2'
+  # @@protoc_insertion_point(class_scope:mdg.engine.proto.TraceV1)
+  ))
+_sym_db.RegisterMessage(TraceV1)
 
-DESCRIPTOR._options = None
+
 _TRACE_DETAILS_VARIABLESJSONENTRY._options = None
 _TRACE_DETAILS_VARIABLESENTRY._options = None
 _TRACE_HTTP_REQUESTHEADERSENTRY._options = None
@@ -2713,6 +3250,8 @@ _CLIENTNAMESTATS_REQUESTSCOUNTPERVERSIONENTRY._options = None
 _CLIENTNAMESTATS_CACHEHITSPERVERSIONENTRY._options = None
 _CLIENTNAMESTATS_PERSISTEDQUERYHITSPERVERSIONENTRY._options = None
 _CLIENTNAMESTATS_PERSISTEDQUERYMISSESPERVERSIONENTRY._options = None
+_CLIENTNAMESTATS_REGISTEREDOPERATIONCOUNTPERVERSIONENTRY._options = None
+_CLIENTNAMESTATS_FORBIDDENOPERATIONCOUNTPERVERSIONENTRY._options = None
 _CONTEXTUALIZEDTYPESTATS_PERTYPESTATENTRY._options = None
 _TYPESTAT_PERFIELDSTATENTRY._options = None
 _QUERYSTATS_PERCLIENTNAMEENTRY._options = None

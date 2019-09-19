@@ -6,13 +6,17 @@ import os
 import socket
 import sys
 
+import six
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
-from six import StringIO
+from six import StringIO, BytesIO
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
 from typing import NamedTuple, Optional, Callable
 
+from tornado_retry_client import RetryClient
+
+from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
 from .reports_pb2 import ReportHeader, FullTracesReport
 
 LOGGER = logging.getLogger(__name__)
@@ -54,10 +58,17 @@ EngineReportingOptions.__new__.__defaults__ = (None,) * len(EngineReportingOptio
 
 def _serialize(message):
     # type: (Message) -> bytes
-    out = StringIO()
+    out = BytesIO() if six.PY3 else StringIO()
     with gzip.GzipFile(fileobj=out, mode="w") as f:
         f.write(message.SerializeToString())
     return out.getvalue()
+
+
+def _get_trace_signature(operation_name, document_ast, query_string):
+    if not document_ast:
+        return query_string
+    else:
+        return default_engine_reporting_signature(document_ast, operation_name)
 
 
 class EngineReportingAgent:
@@ -94,12 +105,13 @@ class EngineReportingAgent:
         return self.options
 
     @coroutine
-    def add_trace(self, signature, operation_name, trace):
+    def add_trace(self, operation_name, document_ast, query_string, trace):
         operation_name = operation_name or '-'
 
         if self._stopped:
             return
 
+        signature = _get_trace_signature(operation_name, document_ast, query_string)
         stats_report_key = "# " + operation_name + '\n' + signature
         traces_per_query = self.report.traces_per_query.get(stats_report_key, None)
         if not traces_per_query:
@@ -129,13 +141,21 @@ class EngineReportingAgent:
         headers.update(self.request_headers)
 
         http_client = AsyncHTTPClient()
+        retry_client = RetryClient(
+            http_client=http_client,
+            retry_attempts=3,
+            retry_start_timeout=0.5,
+            retry_max_timeout=10,
+            retry_factor=2,
+        )
+
         try:
-            response = yield http_client.fetch(self.endpoint_url, method='POST', headers=headers, body=data,
-                                               raise_error=False)
+            response = yield retry_client.fetch(self.endpoint_url, method='POST', headers=headers, body=data,
+                                                raise_error=False)
+
         finally:
             http_client.close()
 
-        # TODO Retries w/exponential backoff
         if 500 <= response.code < 600:
             raise ValueError(response.code + ': ' + response.body)
 

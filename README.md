@@ -57,9 +57,13 @@ async def resolve_foo(self, info):
 Extensions are experimental and most likely will change in future releases as they should be extensions provided by 
 `graphql-server-core`.
 
-# Apollo Engine Reporting
+## Apollo Engine Reporting
 
 You can integrate with Apollo Engine Reporting by enabling the extension.
+
+```console
+$ pip install graphene-tornado[apollo-engine-reporting]
+```
 
 ```python
 engine_options = EngineReportingOptions()
@@ -86,3 +90,24 @@ ENGINE_API_KEY=<your engine API key here> python -m examples.apollo_engine_repor
 ```
 
 Then visit `http://localhost:5000/graphql/graphiql`, make some queries, and view the results in Apollo Engine.
+
+## OpenCensus
+
+You can also use [OpenCensus](https://github.com/census-instrumentation/opencensus-python) for tracing:
+
+```console
+$ pip install graphene-tornado[opencensus]
+```
+
+
+```
+class ExampleOpenCensusApplication(tornado.web.Application):
+
+    def __init__(self):
+        extension = OpenCensusExtension()
+        handlers = [
+            (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[extension])),
+            (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),
+        ]
+        tornado.web.Application.__init__(self, handlers)
+```

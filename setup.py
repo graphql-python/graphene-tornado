@@ -51,8 +51,6 @@ setup(
     install_requires=[
         'six>=1.10.0',
         'graphene>=2.1,<3',
-        'json-stable-stringify-python==0.2',
-        'protobuf>=3.7.1',
         'Jinja2>=2.10.1',
         'tornado>=5.1.0',
         'werkzeug==0.12.2'
@@ -62,7 +60,9 @@ setup(
     ],
     tests_require=tests_require,
     extras_require={
-        'test': tests_require
+        'test': tests_require,
+        'apollo-engine-reporting': ['json-stable-stringify-python==0.2','protobuf>=3.7.1','tornado-retry-client==0.6.1'],
+        'opencensus': ['opencensus>=0.7.3'],
     },
     include_package_data=True,
     zip_safe=False,

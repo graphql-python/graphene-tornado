@@ -1,23 +1,24 @@
 from __future__ import absolute_import
 
 import gzip
-from six import StringIO
 
 import pytest
+import six
 import tornado
-from graphql import build_ast_schema, parse
+from graphql import parse
+from six import StringIO, BytesIO
 from tornado.gen import coroutine
 
-from graphene_tornado.apollo_engine_reporting.engine_agent import EngineReportingAgent, EngineReportingOptions, \
+from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
+from graphene_tornado.ext.apollo_engine_reporting.engine_agent import EngineReportingAgent, EngineReportingOptions, \
     SERVICE_HEADER_DEFAULTS
-from graphene_tornado.apollo_engine_reporting.engine_extension import EngineReportingExtension
-from graphene_tornado.apollo_engine_reporting.reports_pb2 import FullTracesReport
-from graphene_tornado.apollo_engine_reporting.tests.test_engine_extension import SCHEMA_STRING, QUERY
+from graphene_tornado.ext.apollo_engine_reporting.engine_extension import EngineReportingExtension
+from graphene_tornado.ext.apollo_engine_reporting.reports_pb2 import FullTracesReport
+from graphene_tornado.ext.apollo_engine_reporting.tests.schema import schema
+from graphene_tornado.ext.apollo_engine_reporting.tests.test_engine_extension import QUERY
 from graphene_tornado.tests.http_helper import HttpHelper
 from graphene_tornado.tests.test_graphql import response_json, url_string, GRAPHQL_HEADER
 from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
-
-SCHEMA = build_ast_schema(parse(SCHEMA_STRING))
 
 
 class RecordingEngineReportingAgent(EngineReportingAgent):
@@ -43,8 +44,8 @@ class ExampleEngineReportingApplication(tornado.web.Application):
     def __init__(self):
         engine_extension = EngineReportingExtension(engine_options, agent.add_trace)
         handlers = [
-            (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=SCHEMA, extensions=[engine_extension])),
-            (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=SCHEMA, batch=True)),
+            (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[engine_extension])),
+            (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),
         ]
         tornado.web.Application.__init__(self, handlers)
 
@@ -78,7 +79,7 @@ def test_can_send_report_to_engine(http_helper):
 
     assert len(report.traces_per_query) == 1
     key = next(iter(report.traces_per_query))
-    query_key = '# -\n' + QUERY
+    query_key = '# -\n' + default_engine_reporting_signature(parse(QUERY), '')
     assert query_key == key
     assert report.traces_per_query[query_key].trace.pop()
 
@@ -87,5 +88,6 @@ def test_can_send_report_to_engine(http_helper):
 
 
 def _deserialize(message):
-    content = gzip.GzipFile(fileobj=StringIO(message)).read()
+    fileobj = BytesIO(message) if six.PY3 else StringIO(message)
+    content = gzip.GzipFile(fileobj=fileobj).read()
     return FullTracesReport.FromString(content)
