@@ -110,7 +110,7 @@ def add_trace(operation_name, document_ast, query_string, trace):
 class ExampleEngineReportingApplication(tornado.web.Application):
 
     def __init__(self):
-        engine_extension = EngineReportingExtension(engine_options, add_trace)
+        engine_extension = lambda: EngineReportingExtension(engine_options, add_trace)
         handlers = [
             (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[engine_extension])),
             (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),

@@ -19,7 +19,7 @@ from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
 class ExampleOpenCensusApplication(tornado.web.Application):
 
     def __init__(self):
-        extension = OpenCensusExtension()
+        extension = lambda: OpenCensusExtension()
         handlers = [
             (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[extension])),
             (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),

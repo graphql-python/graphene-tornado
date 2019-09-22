@@ -1,19 +1,29 @@
 """
 ExtensionStack is an adapter for GraphQLExtension that helps invoke a list of GraphQLExtension objects at runtime.
 """
-
+import inspect
 from functools import partial
 
 from tornado.gen import coroutine, Return
-from typing import List
+from typing import List, Callable, Union
 
 from graphene_tornado.graphql_extension import GraphQLExtension
 
 
+def instantiate_extensions(extensions):
+    for extension in extensions:
+        if inspect.isclass(extension) or inspect.isfunction(extension):
+            yield extension()
+            continue
+        yield extension
+
+
 class GraphQLExtensionStack(GraphQLExtension):
 
-    def __init__(self, extensions=None):
-        self.extensions = extensions or []  # type: List[GraphQLExtension]
+    def __init__(self,
+                 extensions=None  # type: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]]
+                 ):
+        self.extensions = list(instantiate_extensions(extensions))  # type: List[GraphQLExtension]
 
     @coroutine
     def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):

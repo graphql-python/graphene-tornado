@@ -73,7 +73,7 @@ agent = EngineReportingAgent(engine_options, generate_schema_hash(schema))
 class ExampleEngineReportingApplication(tornado.web.Application):
 
     def __init__(self):
-        engine_extension = EngineReportingExtension(engine_options, agent.add_trace)
+        engine_extension = lambda: EngineReportingExtension(engine_options, agent.add_trace)
         handlers = [
             (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[engine_extension])),
             (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True, 
@@ -104,7 +104,7 @@ $ pip install graphene-tornado[opencensus]
 class ExampleOpenCensusApplication(tornado.web.Application):
 
     def __init__(self):
-        extension = OpenCensusExtension()
+        extension = lambda: OpenCensusExtension()
         handlers = [
             (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[extension])),
             (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),
