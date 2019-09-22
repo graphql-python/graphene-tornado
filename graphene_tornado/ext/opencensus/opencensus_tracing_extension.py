@@ -22,17 +22,17 @@ class OpenCensusExtension(GraphQLExtension):
 
         tracer = execution_context.get_opencensus_tracer()
         tracer.start_span('gql')
-        tracer.add_attribute_to_current_span('gql_operation_name', operation_name)
 
         @coroutine
         def on_request_ended(erors):
-            operation_name = self.operation_name or ''
+            op_name = self.operation_name or ''
             if self.document:
                 calculate_signature = default_engine_reporting_signature
-                signature = calculate_signature(self.document.document_ast, operation_name)
+                signature = calculate_signature(self.document.document_ast, op_name)
             elif self.query_string:
                 signature = self.query_string
 
+            tracer.add_attribute_to_current_span('gql_operation_name', op_name)
             tracer.add_attribute_to_current_span('signature', signature)
             tracer.end_span()
 
@@ -58,6 +58,10 @@ class OpenCensusExtension(GraphQLExtension):
             self.operation_name = '' if not info.operation.name else info.operation.name.value
 
         tracer = execution_context.get_opencensus_tracer()
+
+        # If we wanted to be fancy, we could build up a tree like the ApolloEngineExtension does so that the
+        # whole tree appears as nested spans. However, this is a bit tricky to do with the current OpenCensus
+        # API because when you request a span, a bunch of context variables are set. This keeps it simple for now.
         tracer.start_span('.'.join(str(x) for x in info.path))
 
         @coroutine

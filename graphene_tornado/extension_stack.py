@@ -44,7 +44,7 @@ class GraphQLExtensionStack(GraphQLExtension):
 
         for extension in self.extensions:
             on_end = yield extension.will_resolve_field(root, info, **args)
-            on_end()
+            yield on_end()
 
         @coroutine
         def on_end(error=None, result=None):

@@ -61,9 +61,10 @@ class EngineReportingExtension(GraphQLExtension):
         self.operation_name = None
 
         self.options = options  # maskErrorDetails = False
+        self.start_time = now_ns()
 
         root = Trace.Node()
-        root.start_time = now_ns()
+        root.start_time = self.start_time
         self.trace = Trace(root=root)
         self.nodes = {response_path_as_string(None): root}
         self.generate_client_info = options.generate_client_info or generate_client_info
@@ -116,13 +117,13 @@ class EngineReportingExtension(GraphQLExtension):
             self.operation_name = '' if not info.operation.name else info.operation.name.value
 
         node = self._new_node(info.path)
-        node.start_time = now_ns()
+        node.start_time = now_ns() - self.start_time
         node.type = str(info.return_type)
         node.parent_type = str(info.parent_type)
 
         @coroutine
         def on_end(errors=None, result=None):
-            node.end_time = now_ns()
+            node.end_time = now_ns() - self.start_time
 
         raise Return(on_end)
 
