@@ -60,7 +60,9 @@ setup(
     ],
     tests_require=tests_require,
     extras_require={
-        'test': tests_require
+        'test': tests_require,
+        'apollo-engine-reporting': ['json-stable-stringify-python==0.2','protobuf>=3.7.1','tornado-retry-client==0.6.1'],
+        'opencensus': ['opencensus>=0.7.3'],
     },
     include_package_data=True,
     zip_safe=False,

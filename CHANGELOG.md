@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.5.0
+
+* Apollo Engine and Opencensus trace extensions
+
 # 2.4.0
 
 * Adding some tooling for building observability tools ported from apollo-tooling

@@ -4,9 +4,10 @@ import inspect
 import json
 import sys
 import traceback
+from typing import List, Union, Callable, Any, Optional
 
 import six
-from graphql import get_default_backend, execute, validate
+from graphql import get_default_backend, execute, validate, GraphQLBackend
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 from graphql.execution import ExecutionResult
@@ -20,6 +21,7 @@ from werkzeug.datastructures import MIMEAccept
 from werkzeug.http import parse_accept_header
 
 from graphene_tornado.extension_stack import GraphQLExtensionStack
+from graphene_tornado.graphql_extension import GraphQLExtension
 from graphene_tornado.render_graphiql import render_graphiql
 from graphene_tornado.tornado_executor import TornadoExecutor
 
@@ -50,10 +52,19 @@ class TornadoGraphQLHandler(web.RequestHandler):
     document = None
     graphql_params = None
     parsed_body = None
-    extension_stack = GraphQLExtensionStack()
+    extension_stack = GraphQLExtensionStack([])
 
-    def initialize(self, schema=None, executor=None, middleware=None, root_value=None, graphiql=False, pretty=False,
-                   batch=False, backend=None, extensions=None):
+    def initialize(self,
+                   schema=None, # type: 
+                   executor=None,
+                   middleware=None,  # type: Optional[Any]
+                   root_value=None,  # type: Any
+                   graphiql=False,  # type: bool
+                   pretty=False,  # type: bool
+                   batch=False,  # type: bool
+                   backend=None,  # type: GraphQLBackend
+                   extensions=None  # type: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]]
+                   ):
         super(TornadoGraphQLHandler, self).initialize()
 
         self.schema = schema
