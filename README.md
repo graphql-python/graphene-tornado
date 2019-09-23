@@ -100,7 +100,7 @@ $ pip install graphene-tornado[opencensus]
 ```
 
 
-```
+```python
 class ExampleOpenCensusApplication(tornado.web.Application):
 
     def __init__(self):
