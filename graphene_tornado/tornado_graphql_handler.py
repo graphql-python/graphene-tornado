@@ -53,6 +53,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
     graphql_params = None
     parsed_body = None
     extension_stack = GraphQLExtensionStack([])
+    request_context = {}
 
     def initialize(self,
                    schema=None, # type: 
@@ -202,7 +203,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         query, variables, operation_name, id = self.get_graphql_params(self.request, data)
 
         request_end = yield self.extension_stack.request_started(self.request, query, None, operation_name, variables,
-                                                                 self.context, None)
+                                                                 self.context, self.request_context)
 
         try:
             execution_result = yield self.execute_graphql_request(

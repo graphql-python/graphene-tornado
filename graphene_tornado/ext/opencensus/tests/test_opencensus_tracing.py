@@ -73,7 +73,7 @@ def test_traces_match_query(http_helper, exporter):
     assert spans[5][0].name == 'author.posts.1.id'
     assert spans[5][0].parent_span_id == spans[6][0].span_id
 
-    assert spans[6][0].name == 'gql'
+    assert spans[6][0].name == 'gql[b5c7307ba564]'
     assert spans[6][0].parent_span_id is None
     assert spans[6][0].attributes.get('signature', None) == default_engine_reporting_signature(parse(QUERY), '')
 

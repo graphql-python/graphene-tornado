@@ -16,5 +16,3 @@ def default_engine_reporting_signature(ast, operation_name):
         remove_aliases(hide_literals(drop_unused_definitions(ast, operation_name)))
       )
     )
-
-
