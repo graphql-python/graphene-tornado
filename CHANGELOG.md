@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.5.1 
+
+* Better naming for OpenCensus spans and signature caching
+
 # 2.5.0
 
 * Apollo Engine and Opencensus trace extensions

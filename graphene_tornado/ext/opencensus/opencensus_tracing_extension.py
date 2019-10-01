@@ -2,10 +2,13 @@ from __future__ import absolute_import
 
 import json
 
-from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
-from graphene_tornado.extension_stack import GraphQLExtension
 from opencensus.trace import execution_context
 from tornado.gen import Return, coroutine
+
+from graphene_tornado.apollo_tooling.query_hash import compute
+from graphene_tornado.ext.extension_helpers import get_signature
+from graphene_tornado.extension_stack import GraphQLExtension
+from graphene_tornado.request_context import SIGNATURE_HASH_KEY
 
 
 class OpenCensusExtension(GraphQLExtension):
@@ -24,13 +27,14 @@ class OpenCensusExtension(GraphQLExtension):
         tracer.start_span('gql')
 
         @coroutine
-        def on_request_ended(erors):
+        def on_request_ended(errors):
             op_name = self.operation_name or ''
-            if self.document:
-                calculate_signature = default_engine_reporting_signature
-                signature = calculate_signature(self.document.document_ast, op_name)
-            elif self.query_string:
-                signature = self.query_string
+            signature = get_signature(request_context, operation_name, self.document, query_string)
+
+            tracer = execution_context.get_opencensus_tracer()
+            if SIGNATURE_HASH_KEY not in request_context:
+                request_context[SIGNATURE_HASH_KEY] = compute(signature)
+            tracer.current_span().name = 'gql[{}]'.format(request_context[SIGNATURE_HASH_KEY][0:12])
 
             tracer.add_attribute_to_current_span('gql_operation_name', op_name)
             tracer.add_attribute_to_current_span('signature', signature)
