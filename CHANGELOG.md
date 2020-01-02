@@ -1,5 +1,11 @@
 # Change Log
 
+# 3.0.0
+
+* Dropping support for Python 2
+* Removing TornadoExecutor in favor of built in AsyncioExecutor
+* Switching to native coroutines
+
 # 2.5.1 
 
 * Better naming for OpenCensus spans and signature caching

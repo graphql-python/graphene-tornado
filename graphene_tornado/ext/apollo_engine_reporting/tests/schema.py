@@ -1,6 +1,4 @@
 from graphene import Field, List, Int, Boolean, String, ObjectType, Schema
-from tornado.gen import Return, coroutine
-
 
 SCHEMA_STRING = """
   schema {
@@ -34,9 +32,8 @@ class User(ObjectType):
     name = String()
     posts = Field(lambda: List(Post), limit=Int())
 
-    @coroutine
-    def get_node(self, info, id):
-        raise Return(User(id=id))
+    async def get_node(self, info, id):
+        return User(id=id)
 
     def resolve_posts(self, info, **args):
         return [Post(id=1), Post(id=2)]
@@ -50,9 +47,8 @@ class Post(ObjectType):
     views = Int()
     author = Field(User)
 
-    @coroutine
-    def get_node(self, info, **args):
-        raise Return(Post(id=1))
+    async def get_node(self, info, **args):
+        return Post(id=1)
 
 
 class Query(ObjectType):
@@ -62,13 +58,11 @@ class Query(ObjectType):
     author = Field(User, id=Int())
     top_posts = Field(List(Post), limit=Int())
 
-    @coroutine
-    def resolve_author(self, info, **args):
-        raise Return(User())
+    async def resolve_author(self, info, **args):
+        return User()
 
-    @coroutine
-    def resolve_posts(self, info, **args):
-        raise Return([Post(id=1), Post(id=2)])
+    async def resolve_posts(self, info, **args):
+        return [Post(id=1), Post(id=2)]
 
 
 schema = Schema(query=Query)

@@ -5,15 +5,13 @@ import logging
 import os
 import socket
 import sys
+from typing import NamedTuple, Optional, Callable
 
 import six
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
 from six import StringIO, BytesIO
-from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
-from typing import NamedTuple, Optional, Callable
-
 from tornado_retry_client import RetryClient
 
 from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
@@ -101,11 +99,10 @@ class EngineReportingAgent:
         self.report = FullTracesReport(header=self.report_header)
         self.report_size = 0
 
-    def _options(self): # type: () -> EngineReportingOptions
+    def _options(self) -> EngineReportingOptions:
         return self.options
 
-    @coroutine
-    def add_trace(self, operation_name, document_ast, query_string, trace):
+    async def add_trace(self, operation_name, document_ast, query_string, trace):
         operation_name = operation_name or '-'
 
         if self._stopped:
@@ -118,10 +115,9 @@ class EngineReportingAgent:
             traces_per_query = self.report.traces_per_query[stats_report_key]
         traces_per_query.trace.extend([trace])
 
-        yield self.send_report_and_report_errors()
+        await self.send_report_and_report_errors()
 
-    @coroutine
-    def send_report(self):
+    async def send_report(self):
         report = self.report
         self.reset_report()
 
@@ -131,10 +127,9 @@ class EngineReportingAgent:
         if self.options.debug_print_reports:
             LOGGER.info('Engine sending report: ' + MessageToJson(report))
 
-        yield self.post_data(_serialize(report))
+        await self.post_data(_serialize(report))
 
-    @coroutine
-    def post_data(self, data):
+    async def post_data(self, data):
         headers = {
             'Content-Length': len(data)
         }
@@ -150,7 +145,7 @@ class EngineReportingAgent:
         )
 
         try:
-            response = yield retry_client.fetch(self.endpoint_url, method='POST', headers=headers, body=data,
+            response = await retry_client.fetch(self.endpoint_url, method='POST', headers=headers, body=data,
                                                 raise_error=False)
 
         finally:
@@ -169,9 +164,9 @@ class EngineReportingAgent:
     def stop(self):
         self._stopped = True
 
-    def send_report_and_report_errors(self):
+    async def send_report_and_report_errors(self):
         try:
-            self.send_report()
+            await self.send_report()
         except:
             exception = sys.exc_info()[1]
             if self.options.report_error_function:

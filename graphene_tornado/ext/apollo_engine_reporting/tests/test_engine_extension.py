@@ -103,7 +103,7 @@ engine_options = EngineReportingOptions(api_key='test')
 traces = []
 
 
-def add_trace(operation_name, document_ast, query_string, trace):
+async def add_trace(operation_name, document_ast, query_string, trace):
     traces.append((operation_name, document_ast, query_string, trace))
 
 

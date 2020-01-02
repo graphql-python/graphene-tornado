@@ -18,18 +18,17 @@ class OpenCensusExtension(GraphQLExtension):
         self.query_string = None
         self.document = None
 
-    @coroutine
-    def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
+    async def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
         self.query_string = query_string
         self.document = parsed_query
 
         tracer = execution_context.get_opencensus_tracer()
         tracer.start_span('gql')
 
-        @coroutine
-        def on_request_ended(errors):
+        async def on_request_ended(errors):
             op_name = self.operation_name or ''
-            signature = get_signature(request_context, operation_name, self.document, query_string)
+            document = request_context.get('document', None)
+            signature = get_signature(request_context, operation_name, document, query_string)
 
             tracer = execution_context.get_opencensus_tracer()
             if SIGNATURE_HASH_KEY not in request_context:
@@ -40,24 +39,20 @@ class OpenCensusExtension(GraphQLExtension):
             tracer.add_attribute_to_current_span('signature', signature)
             tracer.end_span()
 
-        raise Return(on_request_ended)
+        return on_request_ended
 
-    @coroutine
-    def parsing_started(self, query_string):
+    async def parsing_started(self, query_string):
         pass
 
-    @coroutine
-    def validation_started(self):
+    async def validation_started(self):
         pass
 
-    @coroutine
-    def execution_started(self, schema, document, root, context, variables, operation_name):
+    async def execution_started(self, schema, document, root, context, variables, operation_name, request_context):
         if operation_name:
             self.operation_name = operation_name
-        self.document = document
+        request_context['document'] = document
 
-    @coroutine
-    def will_resolve_field(self, root, info, **args):
+    async def will_resolve_field(self, root, info, **args):
         if not self.operation_name:
             self.operation_name = '' if not info.operation.name else info.operation.name.value
 
@@ -68,14 +63,12 @@ class OpenCensusExtension(GraphQLExtension):
         # API because when you request a span, a bunch of context variables are set. This keeps it simple for now.
         tracer.start_span('.'.join(str(x) for x in info.path))
 
-        @coroutine
-        def on_end(errors=None, result=None):
+        async def on_end(errors=None, result=None):
             tracer.end_span()
 
-        raise Return(on_end)
+        return on_end
 
-    @coroutine
-    def will_send_response(self, response, context):
+    async def will_send_response(self, response, context):
         if hasattr(response, 'errors'):
             errors = response.errors
             for error in errors:

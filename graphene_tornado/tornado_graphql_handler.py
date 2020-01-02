@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import inspect
 import json
 import sys
@@ -11,9 +9,9 @@ from graphql import get_default_backend, execute, validate, GraphQLBackend
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 from graphql.execution import ExecutionResult
+from graphql.execution.executors.asyncio import AsyncioExecutor
 from tornado import web
 from tornado.escape import json_encode, to_unicode
-from tornado.gen import coroutine, Return
 from tornado.locks import Event
 from tornado.log import app_log
 from tornado.web import HTTPError
@@ -23,7 +21,6 @@ from werkzeug.http import parse_accept_header
 from graphene_tornado.extension_stack import GraphQLExtensionStack
 from graphene_tornado.graphql_extension import GraphQLExtension
 from graphene_tornado.render_graphiql import render_graphiql
-from graphene_tornado.tornado_executor import TornadoExecutor
 
 
 class ExecutionError(Exception):
@@ -107,22 +104,19 @@ class TornadoGraphQLHandler(web.RequestHandler):
     def get_parsed_body(self):
         return self.parsed_body
 
-    @coroutine
-    def get(self):
+    async def get(self):
         try:
-            yield self.run('get')
+            await self.run('get')
         except Exception as ex:
             self.handle_error(ex)
 
-    @coroutine
-    def post(self):
+    async def post(self):
         try:
-            yield self.run('post')
+            await self.run('post')
         except Exception as ex:
             self.handle_error(ex)
 
-    @coroutine
-    def run(self, method):
+    async def run(self, method):
         show_graphiql = self.graphiql and self.should_display_graphiql()
 
         if show_graphiql:
@@ -134,12 +128,12 @@ class TornadoGraphQLHandler(web.RequestHandler):
         if self.batch:
             responses = []
             for entry in data:
-                r = yield self.get_response(entry, method, entry)
+                r = await self.get_response(entry, method, entry)
                 responses.append(r)
             result = '[{}]'.format(','.join([response[0] for response in responses]))
             status_code = max(responses, key=lambda response: response[1])[1]
         else:
-            result, status_code = yield self.get_response(data, method, show_graphiql)
+            result, status_code = await self.get_response(data, method, show_graphiql)
 
         if show_graphiql:
             query, variables, operation_name, id = self.get_graphql_params(self.request, data)
@@ -150,13 +144,13 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 result=result or ''
             )
             self.write(graphiql)
-            self.finish()
+            await self.finish()
             return
 
         self.set_status(status_code)
         self.set_header('Content-Type', 'application/json')
         self.write(result)
-        self.finish()
+        await self.finish()
 
     def parse_body(self):
         content_type = self.content_type
@@ -198,15 +192,14 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.parsed_body = {}
         return self.parsed_body
 
-    @coroutine
-    def get_response(self, data, method, show_graphiql=False):
+    async def get_response(self, data, method, show_graphiql=False):
         query, variables, operation_name, id = self.get_graphql_params(self.request, data)
 
-        request_end = yield self.extension_stack.request_started(self.request, query, None, operation_name, variables,
+        request_end = await self.extension_stack.request_started(self.request, query, None, operation_name, variables,
                                                                  self.context, self.request_context)
 
         try:
-            execution_result = yield self.execute_graphql_request(
+            execution_result = await self.execute_graphql_request(
                 method,
                 query,
                 variables,
@@ -221,8 +214,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 if getattr(execution_result, 'is_pending', False):
                     event = Event()
                     on_resolve = lambda *_: event.set()  # noqa
-                    execution_result.then(on_resolve).catch(on_resolve)
-                    yield event.wait()
+                    await execution_result.then(on_resolve).catch(on_resolve)
+                    await event.wait()
 
                 if hasattr(execution_result, 'get'):
                     execution_result = execution_result.get()
@@ -244,81 +237,80 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 result = None
 
             res = (result, status_code)
-            yield self.extension_stack.will_send_response(result, self.context)
-            raise Return(res)
+            await self.extension_stack.will_send_response(result, self.context)
+            return res
         finally:
-            yield request_end()
+            await request_end()
 
-    @coroutine
-    def execute_graphql_request(self, method, query, variables, operation_name, show_graphiql=False):
+    async def execute_graphql_request(self, method, query, variables, operation_name, show_graphiql=False):
         if not query:
             if show_graphiql:
-                raise Return(None)
+                return None
             raise HTTPError(400, 'Must provide query string.')
 
-        parsing_ended = yield self.extension_stack.parsing_started(query)
+        parsing_ended = await self.extension_stack.parsing_started(query)
         try:
             backend = self.get_backend()
             self.document = backend.document_from_string(self.schema, query)
-            yield parsing_ended()
+            await parsing_ended()
         except Exception as e:
-            yield parsing_ended(e)
-            raise Return(ExecutionResult(errors=[e], invalid=True))
+            await parsing_ended(e)
+            return ExecutionResult(errors=[e], invalid=True)
 
-        validation_ended = yield self.extension_stack.validation_started()
+        validation_ended = await self.extension_stack.validation_started()
         try:
             validation_errors = validate(self.schema, self.document.document_ast)
         except Exception as e:
-            yield validation_ended([e])
-            raise Return(ExecutionResult(errors=[e], invalid=True))
+            await validation_ended([e])
+            return ExecutionResult(errors=[e], invalid=True)
 
         if validation_errors:
             validation_ended(validation_errors)
-            raise Return(ExecutionResult(
+            return ExecutionResult(
                 errors=validation_errors,
                 invalid=True,
-            ))
+            )
         else:
-            yield validation_ended()
+            await validation_ended()
 
         if method.lower() == 'get':
             operation_type = self.document.get_operation_type(operation_name)
             if operation_type and operation_type != "query":
                 if show_graphiql:
-                    raise Return(None)
+                    return None
 
                 raise HTTPError(405, 'Can only perform a {} operation from a POST request.'
                                 .format(operation_type))
 
-        execution_ended = yield self.extension_stack.execution_started(
+        execution_ended = await self.extension_stack.execution_started(
             schema=self.schema,
             document=self.document,
             root=self.root_value,
             context=self.context,
             variables=variables,
-            operation_name=operation_name
+            operation_name=operation_name,
+            request_context=self.request_context
         )
         try:
-            result = yield self.execute(
+            result = await self.execute(
                 self.document.document_ast,
                 root=self.get_root(),
                 variables=variables,
                 operation_name=operation_name,
                 context=self.context,
                 middleware=self.get_middleware(),
-                executor=self.executor or TornadoExecutor(),
+                executor=self.executor or AsyncioExecutor(),
                 return_promise=True
             )
-            yield execution_ended()
+            await execution_ended()
         except Exception as e:
-            yield execution_ended([e])
-            raise Return(ExecutionResult(errors=[e], invalid=True))
+            await execution_ended([e])
+            return ExecutionResult(errors=[e], invalid=True)
 
-        raise Return(result)
+        return result
 
-    @coroutine
-    def execute(self, *args, **kwargs):
-        raise Return(execute(self.schema, *args, **kwargs))
+    async def execute(self, *args, **kwargs):
+        return execute(self.schema, *args, **kwargs)
 
     def json_encode(self, d, pretty=False):
         if pretty or self.get_query_argument('pretty', False):
