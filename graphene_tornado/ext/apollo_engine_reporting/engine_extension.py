@@ -1,25 +1,20 @@
 from __future__ import absolute_import, print_function
 
 import json
-import sys
 import time
 from numbers import Number
+from typing import Callable, NamedTuple
 
 from google.protobuf.timestamp_pb2 import Timestamp
-from tornado.gen import coroutine, Return
 from tornado.httputil import HTTPServerRequest
-from typing import Callable, NamedTuple
 
 from graphene_tornado.ext.apollo_engine_reporting.engine_agent import EngineReportingOptions
 from graphene_tornado.ext.apollo_engine_reporting.reports_pb2 import Trace
 from graphene_tornado.graphql_extension import GraphQLExtension
 
-PY37 = sys.version_info[0:2] >= (3, 7)
-
-
-CLIENT_NAME_HEADER = 'apollographql-client-name';
-CLIENT_REFERENCE_HEADER_KEY = 'apollographql-client-reference-id';
-CLIENT_VERSION_HEADER_KEY = 'apollographql-client-version';
+CLIENT_NAME_HEADER = 'apollographql-client-name'
+CLIENT_REFERENCE_HEADER_KEY = 'apollographql-client-reference-id'
+CLIENT_VERSION_HEADER_KEY = 'apollographql-client-version'
 
 
 ClientInfo = NamedTuple('EngineReportingOptions', [
@@ -45,10 +40,7 @@ def response_path_as_string(path):
 
 
 def now_ns():
-    if PY37:
-        return time.time_ns()
-
-    return long(time.time() * 1000000000)
+    return time.time_ns()
 
 
 class EngineReportingExtension(GraphQLExtension):
@@ -70,8 +62,7 @@ class EngineReportingExtension(GraphQLExtension):
         self.generate_client_info = options.generate_client_info or generate_client_info
         self.resolver_stats = list()
 
-    @coroutine
-    def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
+    async def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
         self.trace.start_time.GetCurrentTime()
         self.query_string = query_string
         self.document = parsed_query
@@ -83,8 +74,7 @@ class EngineReportingExtension(GraphQLExtension):
             self.trace.client_reference_id = client_info.client_reference_id or ''
             self.trace.client_name = client_info.client_name or ''
 
-        @coroutine
-        def on_request_ended(errors):
+        async def on_request_ended(errors):
             start_nanos = self.trace.start_time.ToNanoseconds()
             now = Timestamp()
             now.GetCurrentTime()
@@ -93,26 +83,24 @@ class EngineReportingExtension(GraphQLExtension):
 
             op_name = self.operation_name or ''
             self.trace.root.MergeFrom(self.nodes.get(''))
-            yield self.add_trace(op_name, self.document.document_ast, self.query_string, self.trace)
+            document = request_context.get('document', None)
+            document_ast = document.document_ast if document else None
+            await self.add_trace(op_name, document_ast, self.query_string, self.trace)
 
-        raise Return(on_request_ended)
+        return on_request_ended
 
-    @coroutine
-    def parsing_started(self, query_string):
-        pass
+    async def parsing_started(self, query_string):
+        return None
 
-    @coroutine
-    def validation_started(self):
-        pass
+    async def validation_started(self):
+        return None
 
-    @coroutine
-    def execution_started(self, schema, document, root, context, variables, operation_name):
+    async def execution_started(self, schema, document, root, context, variables, operation_name, request_context):
         if operation_name:
             self.operation_name = operation_name
-        self.document = document
+        request_context['document'] = document
 
-    @coroutine
-    def will_resolve_field(self, root, info, **args):
+    async def will_resolve_field(self, root, info, **args):
         if not self.operation_name:
             self.operation_name = '' if not info.operation.name else info.operation.name.value
 
@@ -121,14 +109,12 @@ class EngineReportingExtension(GraphQLExtension):
         node.type = str(info.return_type)
         node.parent_type = str(info.parent_type)
 
-        @coroutine
-        def on_end(errors=None, result=None):
+        async def on_end(errors=None, result=None):
             node.end_time = now_ns() - self.start_time
 
-        raise Return(on_end)
+        return on_end
 
-    @coroutine
-    def will_send_response(self, response, context):
+    async def will_send_response(self, response, context):
         root = self.nodes.get('', None)
         root.end_time = now_ns()
 

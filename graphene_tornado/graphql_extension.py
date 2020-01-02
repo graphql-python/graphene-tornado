@@ -7,9 +7,11 @@ Extensions are also middleware but have additional hooks.
 from __future__ import absolute_import, print_function
 
 from abc import ABCMeta, abstractmethod
+from typing import NewType, List, Callable, Optional, Dict, Any
 
-from tornado.gen import coroutine, Return
-from typing import NewType, List, Callable, Optional
+from graphql import GraphQLSchema
+from graphql.language.ast import Document
+from tornado.httputil import HTTPServerRequest
 
 EndHandler = NewType('EndHandler', Optional[List[Callable[[List[Exception]], None]]])
 
@@ -47,7 +49,8 @@ class GraphQLExtension:
                           root,  # type: Any
                           context,  # type: Optional[Any]
                           variables,  # type: Optional[Any]
-                          operation_name  # type: Optional[str]
+                          operation_name,  # type: Optional[str]
+                          request_context  # type: Dict[Any, Any]
                           ):
         # type: (...) -> EndHandler
         pass
@@ -74,14 +77,13 @@ class GraphQLExtension:
         Returns:
             An adapter function that acts as middleware
         """
-        @coroutine
-        def middleware(next, root, info, **args):
-            end_resolve = yield self.will_resolve_field(root, info, **args)
+        async def middleware(next, root, info, **args):
+            end_resolve = await self.will_resolve_field(root, info, **args)
             res = None
             errors = []
             try:
                 res = next(root, info, **args)
-                raise Return(res)
+                return res
             finally:
-                yield end_resolve(errors, res)
+                await end_resolve(errors, res)
         return middleware

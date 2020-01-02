@@ -7,7 +7,6 @@ import six
 import tornado
 from graphql import parse
 from six import StringIO, BytesIO
-from tornado.gen import coroutine
 
 from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
 from graphene_tornado.ext.apollo_engine_reporting.engine_agent import EngineReportingAgent, EngineReportingOptions, \
@@ -27,8 +26,7 @@ class RecordingEngineReportingAgent(EngineReportingAgent):
         EngineReportingAgent.__init__(self, options, schema_hash)
         self.data = []
 
-    @coroutine
-    def post_data(self, data):
+    async def post_data(self, data):
         self.data.append(data)
 
     def reset(self):

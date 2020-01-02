@@ -3,57 +3,49 @@ from functools import partial
 
 import pytest
 import tornado
-from tornado.gen import coroutine, Return
 
-from graphene_tornado.schema import schema
 from graphene_tornado.graphql_extension import GraphQLExtension
+from graphene_tornado.schema import schema
 from graphene_tornado.tests.http_helper import HttpHelper
 from graphene_tornado.tests.test_graphql import url_string, GRAPHQL_HEADER, response_json
 from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
-
 
 STARTED = []
 ENDED = []
 
 
-def _track_closed(name, errors=None):
+async def _track_closed(name, errors=None):
     ENDED.append(name)
 
 
 class TrackingExtension(GraphQLExtension):
 
-    @coroutine
-    def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
+    async def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
         phase = 'request'
         STARTED.append(phase)
-        raise Return(partial(_track_closed, phase))
+        return partial(_track_closed, phase)
 
-    @coroutine
-    def parsing_started(self, query_string):
+    async def parsing_started(self, query_string):
         phase = 'parsing'
         STARTED.append(phase)
-        raise Return(partial(_track_closed, phase))
+        return partial(_track_closed, phase)
 
-    @coroutine
-    def validation_started(self):
+    async def validation_started(self):
         phase = 'validation'
         STARTED.append(phase)
-        raise Return(partial(_track_closed, phase))
+        return partial(_track_closed, phase)
 
-    @coroutine
-    def execution_started(self, schema, document, root, context, variables, operation_name):
+    async def execution_started(self, schema, document, root, context, variables, operation_name, request_context):
         phase = 'execution'
         STARTED.append(phase)
-        raise Return(partial(_track_closed, phase))
+        return partial(_track_closed, phase)
 
-    @coroutine
-    def will_resolve_field(self, root, info, **args):
+    async def will_resolve_field(self, root, info, **args):
         phase = 'resolve_field'
         STARTED.append(phase)
-        raise Return(partial(_track_closed, phase))
+        return partial(_track_closed, phase)
 
-    @coroutine
-    def will_send_response(self, response, context):
+    async def will_send_response(self, response, context):
         phase = 'response'
         STARTED.append(phase)
 
@@ -92,5 +84,5 @@ def test_extensions_are_called_in_order(http_helper):
     }
 
     assert ['request', 'parsing', 'validation', 'execution', 'resolve_field', 'response'] == STARTED
-    assert ['parsing', 'validation', 'resolve_field', 'execution', 'request'] == ENDED
+    assert ['parsing', 'validation', 'execution', 'resolve_field', 'request'] == ENDED
 
