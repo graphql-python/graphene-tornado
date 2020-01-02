@@ -1,6 +1,6 @@
 # Change Log
 
-# 3.0.0
+# 2.6.0
 
 * Dropping support for Python 2
 * Removing TornadoExecutor in favor of built in AsyncioExecutor
