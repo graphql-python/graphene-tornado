@@ -23,10 +23,10 @@ class GraphQLExtension:
     @abstractmethod
     def request_started(self,
                         request: HTTPServerRequest,
-                        query_string: Optional[str],,
+                        query_string: Optional[str],
                         parsed_query: Optional[Document],
                         operation_name: Optional[str],
-                        variables: Optional[dict[str, Any]],
+                        variables: Optional[Dict[str, Any]],
                         context: Any,
                         request_context: Any
                         ) -> EndHandler:
