@@ -22,54 +22,48 @@ class GraphQLExtension:
 
     @abstractmethod
     def request_started(self,
-                        request,         # type: HTTPServerRequest
-                        query_string,    # type: Optional[str],
-                        parsed_query,    # type: Optional[Document]
-                        operation_name,  # type: Optional[str]
-                        variables,       # type: Optional[dict[str, Any]]
-                        context,         # type: Any
-                        request_context  # type: Any
-                        ):
-        # type: (...) -> EndHandler
+                        request: HTTPServerRequest,
+                        query_string: Optional[str],,
+                        parsed_query: Optional[Document],
+                        operation_name: Optional[str],
+                        variables: Optional[dict[str, Any]],
+                        context: Any,
+                        request_context: Any
+                        ) -> EndHandler:
         pass
 
     @abstractmethod
-    def parsing_started(self, query_string):  # type: (str) -> EndHandler
+    def parsing_started(self, query_string: str) -> EndHandler:
         pass
 
     @abstractmethod
-    def validation_started(self):
-        # type: () -> EndHandler
+    def validation_started(self) -> EndHandler:
         pass
 
     @abstractmethod
     def execution_started(self,
-                          schema,  # type: GraphQLSchema
-                          document,  # type: Document
-                          root,  # type: Any
-                          context,  # type: Optional[Any]
-                          variables,  # type: Optional[Any]
-                          operation_name,  # type: Optional[str]
-                          request_context  # type: Dict[Any, Any]
-                          ):
-        # type: (...) -> EndHandler
+                          schema: GraphQLSchema,
+                          document: Document,
+                          root: Any,
+                          context: Optional[Any],
+                          variables: Optional[Any],
+                          operation_name: Optional[str],
+                          request_context: Dict[Any, Any]
+                          ) -> EndHandler:
         pass
 
     @abstractmethod
-    def will_resolve_field(self, root, info, **args):
-        # type: (...) -> EndHandler
+    def will_resolve_field(self, root, info, **args) -> EndHandler:
         pass
 
     @abstractmethod
     def will_send_response(self,
-                           response,  # type: Any
-                           context,   # type: Any
-                           ):
-        # type: (...) -> EndHandler
+                           response: Any,
+                           context: Any,
+                           ) -> EndHandler:
         pass
 
-    def as_middleware(self):
-        # type: () -> Callable
+    def as_middleware(self) -> Callable:
         """
         Adapter for using the stack as middleware so that the will_resolve_field function
         is invoked like normal middleware

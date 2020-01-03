@@ -13,8 +13,7 @@ from graphql.language.visitor import Visitor, visit
 from graphene_tornado.apollo_tooling.seperate_operations import separate_operations
 
 
-def hide_literals(ast):
-    # type: (Document) -> Document
+def hide_literals(ast: Document) -> Document:
     """
     Replace numeric, string, list, and object literals with "empty"
     values. Leaves enums alone (since there's no consistent "zero" enum). This
@@ -27,8 +26,7 @@ def hide_literals(ast):
     return ast
 
 
-def hide_string_and_numeric_literals(ast):
-    # type: (Document) -> Document
+def hide_string_and_numeric_literals(ast: Document) -> Document:
     """
     In the same spirit as the similarly named `hideLiterals` function, only
     hide string and numeric literals.
@@ -37,8 +35,7 @@ def hide_string_and_numeric_literals(ast):
     return ast
 
 
-def drop_unused_definitions(ast, operation_name):
-    # type: (Document, str) -> Document
+def drop_unused_definitions(ast: Document, operation_name: str) -> Document:
     """
     A GraphQL query may contain multiple named operations, with the operation to
     use specified separately by the client. This transformation drops unused
@@ -52,8 +49,7 @@ def drop_unused_definitions(ast, operation_name):
     return separated
 
 
-def sort_ast(ast):
-    # type: (Document) -> Document
+def sort_ast(ast: Document) -> Document:
     """
     sortAST sorts most multi-child nodes alphabetically. Using this as part of
     your signature calculation function may make it easier to tell the difference
@@ -65,8 +61,7 @@ def sort_ast(ast):
     return ast
 
 
-def remove_aliases(ast):
-    # type: (Document) -> Document
+def remove_aliases(ast: Document) -> Document:
     """
     removeAliases gets rid of GraphQL aliases, a feature by which you can tell a
     server to return a field's data under a different name from the field
@@ -77,8 +72,7 @@ def remove_aliases(ast):
     return ast
 
 
-def print_with_reduced_whitespace(ast):
-    # type: (Document) -> str
+def print_with_reduced_whitespace(ast: Document) -> str:
     """
     Like the graphql-js print function, but deleting whitespace wherever
     feasible. Specifically, all whitespace (outside of string literals) is

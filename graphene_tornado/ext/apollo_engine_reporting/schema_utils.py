@@ -8,8 +8,7 @@ from graphql.utils.introspection_query import introspection_query
 from json_stable_stringify_python import stringify
 
 
-def generate_schema_hash(schema):
-    # type: (Schema) -> str
+def generate_schema_hash(schema: Schema) -> str:
     """
     Generates a stable hash of the current schema using an introspection query.
     """

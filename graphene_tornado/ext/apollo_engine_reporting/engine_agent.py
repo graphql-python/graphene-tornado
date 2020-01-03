@@ -54,8 +54,7 @@ EngineReportingOptions = NamedTuple('EngineReportingOptions', [
 EngineReportingOptions.__new__.__defaults__ = (None,) * len(EngineReportingOptions._fields)
 
 
-def _serialize(message):
-    # type: (Message) -> bytes
+def _serialize(message: Message) -> bytes:
     out = BytesIO() if six.PY3 else StringIO()
     with gzip.GzipFile(fileobj=out, mode="w") as f:
         f.write(message.SerializeToString())
@@ -71,7 +70,7 @@ def _get_trace_signature(operation_name, document_ast, query_string):
 
 class EngineReportingAgent:
 
-    def __init__(self, options, schema_hash):  # type: (EngineReportingOptions, str) -> None
+    def __init__(self, options: EngineReportingOptions, schema_hash: str) -> None:
         self.options = options
         self.api_key = options.api_key or os.getenv('ENGINE_API_KEY', None)
 
@@ -176,6 +175,6 @@ class EngineReportingAgent:
 
     def reset_report(self):
         self.report = FullTracesReport(header=self.report_header)
-        self.report_size = 0  # type: int
+        self.report_size: int = 0
 
 

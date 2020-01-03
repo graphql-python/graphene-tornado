@@ -24,8 +24,7 @@ ClientInfo = NamedTuple('EngineReportingOptions', [
 ])
 
 
-def generate_client_info(request):
-    # type: (HTTPServerRequest) -> ClientInfo
+def generate_client_info(request: HTTPServerRequest) -> ClientInfo:
     return ClientInfo(
         request.headers.get(CLIENT_NAME_HEADER, ''),
         request.headers.get(CLIENT_REFERENCE_HEADER_KEY, ''),
@@ -45,7 +44,7 @@ def now_ns():
 
 class EngineReportingExtension(GraphQLExtension):
 
-    def __init__(self, options, add_trace):  # type: (EngineReportingOptions, Callable) -> None
+    def __init__(self, options: EngineReportingOptions, add_trace: Callable) -> None:
         if add_trace is None:
             raise ValueError('add_trace must be defined')
 

@@ -53,15 +53,15 @@ class TornadoGraphQLHandler(web.RequestHandler):
     request_context = {}
 
     def initialize(self,
-                   schema=None, # type: 
+                   schema=None, 
                    executor=None,
-                   middleware=None,  # type: Optional[Any]
-                   root_value=None,  # type: Any
-                   graphiql=False,  # type: bool
-                   pretty=False,  # type: bool
-                   batch=False,  # type: bool
-                   backend=None,  # type: GraphQLBackend
-                   extensions=None  # type: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]]
+                   middleware: Optional[Any] = None,
+                   root_value: Any = None,
+                   graphiql: bool = False,
+                   pretty: bool = False,
+                   batch: bool = False,
+                   backend: GraphQLBackend = None,
+                   extensions: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]] = None
                    ):
         super(TornadoGraphQLHandler, self).initialize()
 
