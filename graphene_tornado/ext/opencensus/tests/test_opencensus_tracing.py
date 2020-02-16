@@ -1,8 +1,9 @@
+from typing import Optional, Any, List, Union, Callable
+
 import pytest
-import six
 import tornado
-from graphql import parse
-from opencensus.trace import tracer as tracer_module
+from graphql import parse, GraphQLBackend
+from opencensus.trace import tracer as tracer_module, execution_context
 from opencensus.trace.base_exporter import Exporter
 from opencensus.trace.propagation.google_cloud_format import GoogleCloudFormatPropagator
 from opencensus.trace.samplers import AlwaysOnSampler
@@ -11,25 +12,49 @@ from graphene_tornado.apollo_tooling.operation_id import default_engine_reportin
 from graphene_tornado.ext.apollo_engine_reporting.tests.schema import schema
 from graphene_tornado.ext.apollo_engine_reporting.tests.test_engine_extension import QUERY
 from graphene_tornado.ext.opencensus.opencensus_tracing_extension import OpenCensusExtension
+from graphene_tornado.graphql_extension import GraphQLExtension
 from graphene_tornado.tests.http_helper import HttpHelper
 from graphene_tornado.tests.test_graphql import response_json, url_string, GRAPHQL_HEADER
 from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
 
 
+class GQLHandler(TornadoGraphQLHandler):
+
+    def initialize(self, schema=None, executor=None, middleware: Optional[Any] = None, root_value: Any = None,
+                   graphiql: bool = False, pretty: bool = False, batch: bool = False, backend: GraphQLBackend = None,
+                   extensions: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]] = None,
+                   exporter=None):
+        super().initialize(schema, executor, middleware, root_value, graphiql, pretty, batch, backend, extensions)
+        execution_context.set_opencensus_tracer(tracer_module.Tracer(
+                sampler=AlwaysOnSampler(),
+                exporter=exporter,
+                propagator=GoogleCloudFormatPropagator()
+            )
+        )
+
+    def on_finish(self) -> None:
+        tracer = execution_context.get_opencensus_tracer()
+        tracer.finish()
+
+
 class ExampleOpenCensusApplication(tornado.web.Application):
 
-    def __init__(self):
+    def __init__(self, exporter):
         extension = lambda: OpenCensusExtension()
         handlers = [
-            (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[extension])),
-            (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),
+            (r'/graphql', GQLHandler, dict(graphiql=True, schema=schema, extensions=[extension], exporter=exporter)),
         ]
         tornado.web.Application.__init__(self, handlers)
 
 
 @pytest.fixture
-def app():
-    return ExampleOpenCensusApplication()
+def app(exporter):
+    return ExampleOpenCensusApplication(exporter)
+
+
+@pytest.fixture
+def app(exporter):
+    return ExampleOpenCensusApplication(exporter)
 
 
 @pytest.fixture
@@ -39,13 +64,7 @@ def http_helper(http_client, base_url):
 
 @pytest.fixture
 def exporter():
-    exporter = CapturingExporter()
-    tracer_module.Tracer(
-        sampler=AlwaysOnSampler(),
-        exporter=exporter,
-        propagator=GoogleCloudFormatPropagator()
-    )
-    return exporter
+    return CapturingExporter()
 
 
 @pytest.mark.gen_test()
@@ -54,28 +73,28 @@ def test_traces_match_query(http_helper, exporter):
     assert response.code == 200
     assert 'data' in response_json(response)
 
-    # OpenCensus is quite ready for Python3+Tornado yet
-    if six.PY3:
-        return
+    parent = exporter.spans.pop()[0]
 
-    spans = exporter.spans
+    assert parent.name == 'gql[b5c7307ba564]'
+    assert parent.parent_span_id is None
+    assert parent.attributes.get('signature', None) == default_engine_reporting_signature(parse(QUERY), '')
 
-    assert spans[0][0].name == 'author'
-    assert spans[0][0].parent_span_id == spans[6][0].span_id
-    assert spans[1][0].name == 'aBoolean'
-    assert spans[1][0].parent_span_id == spans[6][0].span_id
-    assert spans[2][0].name == 'author.name'
-    assert spans[2][0].parent_span_id == spans[6][0].span_id
-    assert spans[3][0].name == 'author.posts'
-    assert spans[3][0].parent_span_id == spans[6][0].span_id
-    assert spans[4][0].name == 'author.posts.0.id'
-    assert spans[4][0].parent_span_id == spans[6][0].span_id
-    assert spans[5][0].name == 'author.posts.1.id'
-    assert spans[5][0].parent_span_id == spans[6][0].span_id
+    spans = [span for span_list in exporter.spans for span in span_list]
 
-    assert spans[6][0].name == 'gql[b5c7307ba564]'
-    assert spans[6][0].parent_span_id is None
-    assert spans[6][0].attributes.get('signature', None) == default_engine_reporting_signature(parse(QUERY), '')
+    expected = [
+        'gql_parsing',
+        'gql_validation',
+        'author',
+        'aBoolean',
+        'author.name',
+        'author.posts',
+        'author.posts.0.id',
+        'author.posts.1.id'
+    ]
+    
+    for span, exp in zip(spans, expected):
+        assert span.name == exp
+        assert span.parent_span_id == parent.span_id
 
 
 class CapturingExporter(Exporter):

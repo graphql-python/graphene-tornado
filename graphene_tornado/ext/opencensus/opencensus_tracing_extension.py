@@ -42,10 +42,26 @@ class OpenCensusExtension(GraphQLExtension):
         return on_request_ended
 
     async def parsing_started(self, query_string):
-        pass
+        tracer = execution_context.get_opencensus_tracer()
+
+        tracer.start_span('gql_parsing')
+
+        async def on_parsing_ended(errors):
+            tracer = execution_context.get_opencensus_tracer()
+            tracer.end_span()
+
+        return on_parsing_ended
 
     async def validation_started(self):
-        pass
+        tracer = execution_context.get_opencensus_tracer()
+
+        tracer.start_span('gql_validation')
+
+        async def on_validation_ended(errors):
+            tracer = execution_context.get_opencensus_tracer()
+            tracer.end_span()
+
+        return on_validation_ended
 
     async def execution_started(self, schema, document, root, context, variables, operation_name, request_context):
         if operation_name:
