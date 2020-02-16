@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.6.1
+
+* Tracing support for validation and parsing
+
 # 2.6.0
 
 * Dropping support for Python 2
