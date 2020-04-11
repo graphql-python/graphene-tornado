@@ -1,14 +1,16 @@
-from __future__ import absolute_import
-
 import json
 
 from opencensus.trace import execution_context
-from tornado.gen import Return, coroutine
+from opencensus.trace.tracers.noop_tracer import NoopTracer
 
 from graphene_tornado.apollo_tooling.query_hash import compute
 from graphene_tornado.ext.extension_helpers import get_signature
 from graphene_tornado.extension_stack import GraphQLExtension
 from graphene_tornado.request_context import SIGNATURE_HASH_KEY
+
+
+async def _pass(*args):
+    pass
 
 
 class OpenCensusExtension(GraphQLExtension):
@@ -23,6 +25,9 @@ class OpenCensusExtension(GraphQLExtension):
         self.document = parsed_query
 
         tracer = execution_context.get_opencensus_tracer()
+        if isinstance(tracer, NoopTracer):
+            return _pass
+        
         tracer.start_span('gql')
 
         async def on_request_ended(errors):
