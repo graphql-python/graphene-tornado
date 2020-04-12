@@ -1,10 +1,14 @@
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+from typing import Optional
 
 import graphene
-from graphene import ObjectType, Schema
-from tornado.escape import to_unicode
+from graphene import ObjectType
+from graphene import Schema
 from graphql.type.definition import GraphQLResolveInfo
-from typing import Optional
+from tornado.escape import to_unicode
 
 
 class QueryRoot(ObjectType):
@@ -17,10 +21,10 @@ class QueryRoot(ObjectType):
         raise Exception("Throws!")
 
     def resolve_request(self, info: GraphQLResolveInfo) -> str:
-        return to_unicode(info.context.arguments['q'][0])
+        return to_unicode(info.context.arguments["q"][0])
 
-    def resolve_test(self, info: GraphQLResolveInfo, who: Optional[str]=None) -> str:
-        return 'Hello %s' % (who or 'World')
+    def resolve_test(self, info: GraphQLResolveInfo, who: Optional[str] = None) -> str:
+        return "Hello %s" % (who or "World")
 
 
 class MutationRoot(ObjectType):

@@ -7,7 +7,9 @@ import tornado
 from graphene_tornado.graphql_extension import GraphQLExtension
 from graphene_tornado.schema import schema
 from graphene_tornado.tests.http_helper import HttpHelper
-from graphene_tornado.tests.test_graphql import url_string, GRAPHQL_HEADER, response_json
+from graphene_tornado.tests.test_graphql import GRAPHQL_HEADER
+from graphene_tornado.tests.test_graphql import response_json
+from graphene_tornado.tests.test_graphql import url_string
 from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
 
 STARTED = []
@@ -19,44 +21,72 @@ async def _track_closed(name, errors=None):
 
 
 class TrackingExtension(GraphQLExtension):
-
-    async def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
-        phase = 'request'
+    async def request_started(
+        self,
+        request,
+        query_string,
+        parsed_query,
+        operation_name,
+        variables,
+        context,
+        request_context,
+    ):
+        phase = "request"
         STARTED.append(phase)
         return partial(_track_closed, phase)
 
     async def parsing_started(self, query_string):
-        phase = 'parsing'
+        phase = "parsing"
         STARTED.append(phase)
         return partial(_track_closed, phase)
 
     async def validation_started(self):
-        phase = 'validation'
+        phase = "validation"
         STARTED.append(phase)
         return partial(_track_closed, phase)
 
-    async def execution_started(self, schema, document, root, context, variables, operation_name, request_context):
-        phase = 'execution'
+    async def execution_started(
+        self,
+        schema,
+        document,
+        root,
+        context,
+        variables,
+        operation_name,
+        request_context,
+    ):
+        phase = "execution"
         STARTED.append(phase)
         return partial(_track_closed, phase)
 
     async def will_resolve_field(self, root, info, **args):
-        phase = 'resolve_field'
+        phase = "resolve_field"
         STARTED.append(phase)
         return partial(_track_closed, phase)
 
     async def will_send_response(self, response, context):
-        phase = 'response'
+        phase = "response"
         STARTED.append(phase)
 
 
 class ExampleExtensionsApplication(tornado.web.Application):
-
     def __init__(self):
         handlers = [
-            (r'/graphql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, extensions=[TrackingExtension()])),
-            (r'/graphql/batch', TornadoGraphQLHandler, dict(graphiql=True, schema=schema, batch=True)),
-            (r'/graphql/graphiql', TornadoGraphQLHandler, dict(graphiql=True, schema=schema))
+            (
+                r"/graphql",
+                TornadoGraphQLHandler,
+                dict(graphiql=True, schema=schema, extensions=[TrackingExtension()]),
+            ),
+            (
+                r"/graphql/batch",
+                TornadoGraphQLHandler,
+                dict(graphiql=True, schema=schema, batch=True),
+            ),
+            (
+                r"/graphql/graphiql",
+                TornadoGraphQLHandler,
+                dict(graphiql=True, schema=schema),
+            ),
         ]
         tornado.web.Application.__init__(self, handlers)
 
@@ -73,16 +103,23 @@ def http_helper(http_client, base_url):
 
 @pytest.mark.gen_test
 def test_extensions_are_called_in_order(http_helper):
-    response = yield http_helper.get(url_string(
-        query='query helloWho($who: String){ test(who: $who) }',
-        variables=json.dumps({'who': "Dolly"})
-    ), headers=GRAPHQL_HEADER)
+    response = yield http_helper.get(
+        url_string(
+            query="query helloWho($who: String){ test(who: $who) }",
+            variables=json.dumps({"who": "Dolly"}),
+        ),
+        headers=GRAPHQL_HEADER,
+    )
 
     assert response.code == 200
-    assert response_json(response) == {
-        'data': {'test': "Hello Dolly"}
-    }
+    assert response_json(response) == {"data": {"test": "Hello Dolly"}}
 
-    assert ['request', 'parsing', 'validation', 'execution', 'resolve_field', 'response'] == STARTED
-    assert ['parsing', 'validation', 'execution', 'resolve_field', 'request'] == ENDED
-
+    assert [
+        "request",
+        "parsing",
+        "validation",
+        "execution",
+        "resolve_field",
+        "response",
+    ] == STARTED
+    assert ["parsing", "validation", "execution", "resolve_field", "request"] == ENDED

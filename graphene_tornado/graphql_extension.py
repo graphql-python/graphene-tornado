@@ -27,15 +27,16 @@ class GraphQLExtension:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def request_started(self,
-                        request: HTTPServerRequest,
-                        query_string: Optional[str],
-                        parsed_query: Optional[DocumentNode],
-                        operation_name: Optional[str],
-                        variables: Optional[Dict[str, Any]],
-                        context: Any,
-                        request_context: Any
-                        ) -> EndHandler:
+    def request_started(
+        self,
+        request: HTTPServerRequest,
+        query_string: Optional[str],
+        parsed_query: Optional[DocumentNode],
+        operation_name: Optional[str],
+        variables: Optional[Dict[str, Any]],
+        context: Any,
+        request_context: Any,
+    ) -> EndHandler:
         pass
 
     @abstractmethod
@@ -47,15 +48,16 @@ class GraphQLExtension:
         pass
 
     @abstractmethod
-    def execution_started(self,
-                          schema: GraphQLSchema,
-                          document: DocumentNode,
-                          root: Any,
-                          context: Optional[Any],
-                          variables: Optional[Any],
-                          operation_name: Optional[str],
-                          request_context: Dict[Any, Any]
-                          ) -> EndHandler:
+    def execution_started(
+        self,
+        schema: GraphQLSchema,
+        document: DocumentNode,
+        root: Any,
+        context: Optional[Any],
+        variables: Optional[Any],
+        operation_name: Optional[str],
+        request_context: Dict[Any, Any],
+    ) -> EndHandler:
         pass
 
     @abstractmethod
@@ -63,10 +65,7 @@ class GraphQLExtension:
         pass
 
     @abstractmethod
-    def will_send_response(self,
-                           response: Any,
-                           context: Any,
-                           ) -> EndHandler:
+    def will_send_response(self, response: Any, context: Any,) -> EndHandler:
         pass
 
     def as_middleware(self) -> Callable:
@@ -77,6 +76,7 @@ class GraphQLExtension:
         Returns:
             An adapter function that acts as middleware
         """
+
         async def middleware(next, root, info, **args):
             end_resolve = await self.will_resolve_field(root, info, **args)
             res = None
@@ -86,4 +86,5 @@ class GraphQLExtension:
                 return res
             finally:
                 await end_resolve(errors, res)
+
         return middleware

@@ -2,7 +2,9 @@
 ExtensionStack is an adapter for GraphQLExtension that helps invoke a list of GraphQLExtension objects at runtime.
 """
 import inspect
-from typing import List, Callable, Union
+from typing import Callable
+from typing import List
+from typing import Union
 
 from graphene_tornado.graphql_extension import GraphQLExtension
 
@@ -16,28 +18,66 @@ def instantiate_extensions(extensions):
 
 
 class GraphQLExtensionStack(GraphQLExtension):
+    def __init__(
+        self,
+        extensions: List[
+            Union[Callable[[], GraphQLExtension], GraphQLExtension]
+        ] = None,
+    ):
+        self.extensions: List[GraphQLExtension] = list(
+            instantiate_extensions(extensions)
+        )
 
-    def __init__(self,
-                 extensions: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]] = None
-                 ):
-        self.extensions: List[GraphQLExtension] = list(instantiate_extensions(extensions))
-
-    async def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
-        on_end = await self._handle_did_start('request_started', request, query_string, parsed_query, operation_name,
-                                              variables, context, request_context)
+    async def request_started(
+        self,
+        request,
+        query_string,
+        parsed_query,
+        operation_name,
+        variables,
+        context,
+        request_context,
+    ):
+        on_end = await self._handle_did_start(
+            "request_started",
+            request,
+            query_string,
+            parsed_query,
+            operation_name,
+            variables,
+            context,
+            request_context,
+        )
         return on_end
 
     async def parsing_started(self, query_string):
-        on_end = await self._handle_did_start('parsing_started', query_string)
+        on_end = await self._handle_did_start("parsing_started", query_string)
         return on_end
 
     async def validation_started(self):
-        on_end = await self._handle_did_start('validation_started')
+        on_end = await self._handle_did_start("validation_started")
         return on_end
 
-    async def execution_started(self, schema, document, root, context, variables, operation_name, request_context):
-        on_end = await self._handle_did_start('execution_started', schema, document, root, context,
-                                              variables, operation_name, request_context)
+    async def execution_started(
+        self,
+        schema,
+        document,
+        root,
+        context,
+        variables,
+        operation_name,
+        request_context,
+    ):
+        on_end = await self._handle_did_start(
+            "execution_started",
+            schema,
+            document,
+            root,
+            context,
+            variables,
+            operation_name,
+            request_context,
+        )
         return on_end
 
     async def will_resolve_field(self, root, info, **args):

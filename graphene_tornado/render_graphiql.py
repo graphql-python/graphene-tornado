@@ -1,13 +1,16 @@
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import json
 
-from jinja2 import Environment, Undefined
+from jinja2 import Environment
+from jinja2 import Undefined
 from markupsafe import Markup
 
-GRAPHIQL_VERSION = '0.10.2'
+GRAPHIQL_VERSION = "0.10.2"
 
-TEMPLATE = '''<!--
+TEMPLATE = """<!--
 The request to this GraphQL server provided the header "Accept: text/html"
 and as a result has been presented GraphiQL - an in-browser IDE for
 exploring GraphQL.
@@ -117,20 +120,18 @@ add "&raw" to the end of the URL within a browser.
     );
   </script>
 </body>
-</html>'''
+</html>"""
 
-_slash_escape = '\\/' not in json.dumps('/')
-jinja_options = {
-    'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_']
-}
+_slash_escape = "\\/" not in json.dumps("/")
+jinja_options = {"extensions": ["jinja2.ext.autoescape", "jinja2.ext.with_"]}
 
 
 # TODO Memoize
 def create_jinja_environment():
     options = dict(jinja_options)
-    options['autoescape'] = True
+    options["autoescape"] = True
     rv = Environment()
-    rv.filters['tojson'] = tojson_filter
+    rv.filters["tojson"] = tojson_filter
     return rv
 
 
@@ -165,18 +166,27 @@ def htmlsafe_dumps(obj, **kwargs):
        quoted.  Always single quote attributes if you use the ``|tojson``
        filter.  Alternatively use ``|tojson|forceescape``.
     """
-    rv = json.dumps(obj, **kwargs) \
-        .replace(u'<', u'\\u003c') \
-        .replace(u'>', u'\\u003e') \
-        .replace(u'&', u'\\u0026') \
-        .replace(u"'", u'\\u0027')
+    rv = (
+        json.dumps(obj, **kwargs)
+        .replace(u"<", u"\\u003c")
+        .replace(u">", u"\\u003e")
+        .replace(u"&", u"\\u0026")
+        .replace(u"'", u"\\u0027")
+    )
     if not _slash_escape:
-        rv = rv.replace('\\/', '/')
+        rv = rv.replace("\\/", "/")
     return rv
 
 
-def render_graphiql(query, variables, operation_name, result, graphiql_version=None,
-                    graphiql_template=None, graphiql_html_title=None):
+def render_graphiql(
+    query,
+    variables,
+    operation_name,
+    result,
+    graphiql_version=None,
+    graphiql_template=None,
+    graphiql_html_title=None,
+):
     graphiql_version = graphiql_version or GRAPHIQL_VERSION
     template = graphiql_template or TEMPLATE
 
@@ -187,7 +197,7 @@ def render_graphiql(query, variables, operation_name, result, graphiql_version=N
         result=result,
         query=query,
         variables=variables,
-        operation_name=operation_name
+        operation_name=operation_name,
     )
 
     tmpl = jinja.from_string(template)

@@ -7,7 +7,9 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_can_send_report_to_engine 1'] = '''{
+snapshots[
+    "test_can_send_report_to_engine 1"
+] = """{
   "durationNs": "-1",
   "endTime": "2019-09-21T19:37:09.908919Z",
   "http": {
@@ -102,4 +104,4 @@ snapshots['test_can_send_report_to_engine 1'] = '''{
     "startTime": "-1"
   },
   "startTime": "2019-09-21T19:37:09.908919Z"
-}'''
+}"""

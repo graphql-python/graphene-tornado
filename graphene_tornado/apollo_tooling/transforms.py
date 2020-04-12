@@ -15,12 +15,12 @@ from graphql import IntValueNode
 from graphql import ListValueNode
 from graphql import ObjectValueNode
 from graphql import OperationDefinitionNode
-
 from graphql import print_ast
 from graphql import SelectionSetNode
 from graphql import separate_operations
 from graphql import StringValueNode
-from graphql.language.visitor import Visitor, visit
+from graphql.language.visitor import visit
+from graphql.language.visitor import Visitor
 
 
 def hide_literals(ast: DocumentNode) -> DocumentNode:
@@ -90,10 +90,10 @@ def print_with_reduced_whitespace(ast: DocumentNode) -> str:
     for between two alphanumerics.
     """
     visit(ast, _HEX_CONVERSION_VISITOR)
-    val = re.sub(r'\s+', ' ',  print_ast(ast))
+    val = re.sub(r"\s+", " ", print_ast(ast))
 
-    val = re.sub(r'([^_a-zA-Z0-9]) ', _replace_with_first_group, val)
-    val = re.sub(r' ([^_a-zA-Z0-9])', _replace_with_first_group, val)
+    val = re.sub(r"([^_a-zA-Z0-9]) ", _replace_with_first_group, val)
+    val = re.sub(r" ([^_a-zA-Z0-9])", _replace_with_first_group, val)
     val = re.sub(r'"([a-f0-9]+)"', _from_hex, val)
 
     return val
@@ -106,9 +106,9 @@ def _replace_with_first_group(match):
 def _from_hex(match):
     m = match.group(1)
     if six.PY3:
-        m = bytes.fromhex(m).decode('utf-8')
+        m = bytes.fromhex(m).decode("utf-8")
     else:
-        m = m.decode('hex').encode('utf-8')
+        m = m.decode("hex").encode("utf-8")
     return '"' + m + '"'
 
 
@@ -119,7 +119,6 @@ def _sorted(items, key):
 
 
 class _HideLiteralsVisitor(Visitor):
-
     def __init__(self, only_string_and_numeric=False):
         super(_HideLiteralsVisitor, self).__init__()
         self._only_string_and_numeric = only_string_and_numeric
@@ -139,14 +138,15 @@ class _HideLiteralsVisitor(Visitor):
 
 
 _HIDE_LITERALS_VISITOR = _HideLiteralsVisitor()
-_HIDE_ONLY_STRING_AND_NUMERIC_LITERALS_VISITOR = _HideLiteralsVisitor(only_string_and_numeric=True)
+_HIDE_ONLY_STRING_AND_NUMERIC_LITERALS_VISITOR = _HideLiteralsVisitor(
+    only_string_and_numeric=True
+)
 
 
 class _RemoveAliasesVisitor(Visitor):
-
     def enter(self, node, key, parent, path, ancestors):
         if isinstance(node, FieldNode):
-           node.alias = None
+            node.alias = None
         return node
 
 
@@ -154,13 +154,12 @@ _REMOVE_ALIAS_VISITOR = _RemoveAliasesVisitor()
 
 
 class _HexConversionVisitor(Visitor):
-
     def enter(self, node, key, parent, path, ancestors):
         if isinstance(node, StringValueNode) and node.value is not None:
             if six.PY3:
-                encoded = node.value.encode('utf-8').hex()
+                encoded = node.value.encode("utf-8").hex()
             else:
-                encoded = node.value.encode('hex')
+                encoded = node.value.encode("hex")
             node.value = encoded
         return node
 
@@ -169,14 +168,19 @@ _HEX_CONVERSION_VISITOR = _HexConversionVisitor()
 
 
 class _SortingVisitor(Visitor):
-
     def enter(self, node, key, parent, path, ancestors):
         if isinstance(node, DocumentNode):
-            node.definitions = _sorted(node.definitions, lambda x: (x.__class__.__name__, self._by_name(x)))
+            node.definitions = _sorted(
+                node.definitions, lambda x: (x.__class__.__name__, self._by_name(x))
+            )
         elif isinstance(node, OperationDefinitionNode):
-            node.variable_definitions = _sorted(node.variable_definitions, self._by_variable_name)
+            node.variable_definitions = _sorted(
+                node.variable_definitions, self._by_variable_name
+            )
         elif isinstance(node, SelectionSetNode):
-            node.selections = _sorted(node.selections, lambda x: (x.__class__.__name__, self._by_name(x)))
+            node.selections = _sorted(
+                node.selections, lambda x: (x.__class__.__name__, self._by_name(x))
+            )
         elif isinstance(node, FieldNode):
             node.arguments = _sorted(node.arguments, self._by_name)
         elif isinstance(node, FragmentSpreadNode):

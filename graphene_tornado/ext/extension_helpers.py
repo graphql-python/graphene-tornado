@@ -1,6 +1,8 @@
 import collections
 
-from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
+from graphene_tornado.apollo_tooling.operation_id import (
+    default_engine_reporting_signature,
+)
 from graphene_tornado.request_context import SIGNATURE
 
 
@@ -50,5 +52,3 @@ def get_signature(request_context, operation_name, document, query_string):
             signature = query_string
         request_context[SIGNATURE] = signature
     return signature
-
-

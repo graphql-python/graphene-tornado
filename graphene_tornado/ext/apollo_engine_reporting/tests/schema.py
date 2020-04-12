@@ -1,4 +1,10 @@
-from graphene import Field, List, Int, Boolean, String, ObjectType, Schema
+from graphene import Boolean
+from graphene import Field
+from graphene import Int
+from graphene import List
+from graphene import ObjectType
+from graphene import Schema
+from graphene import String
 
 SCHEMA_STRING = """
   schema {
@@ -52,9 +58,9 @@ class Post(ObjectType):
 
 
 class Query(ObjectType):
-    a_string = Field(String, name='aString')
-    a_boolean = Field(Boolean, name='aBoolean')
-    an_int = Field(Int, name='anInt')
+    a_string = Field(String, name="aString")
+    a_boolean = Field(Boolean, name="aBoolean")
+    an_int = Field(Int, name="anInt")
     author = Field(User, id=Int())
     top_posts = Field(List(Post), limit=Int())
 
@@ -66,4 +72,3 @@ class Query(ObjectType):
 
 
 schema = Schema(query=Query)
-
