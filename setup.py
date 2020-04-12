@@ -51,7 +51,7 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
-        'graphene>3.0b1',
+        'graphene>=3.0b1',
         'Jinja2>=2.10.1',
         'tornado>=5.1.0',
         'werkzeug==0.12.2'
