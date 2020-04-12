@@ -1,9 +1,10 @@
 six>=1.10.0
 json-stable-stringify-python==0.2
-graphene>=2.0.1
+graphene>=3.0b1
 Jinja2>=2.10.1, <2.11.0
 opencensus>=0.7.7
 protobuf>=3.7.1
+snapshottest==0.5.1
 tornado>=5.1.0
 tornado-retry-client==0.6.1
 tox

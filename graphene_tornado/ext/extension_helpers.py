@@ -45,7 +45,7 @@ def get_signature(request_context, operation_name, document, query_string):
     if signature is None:
         if document:
             calculate_signature = default_engine_reporting_signature
-            signature = calculate_signature(document.document_ast, operation_name)
+            signature = calculate_signature(document, operation_name)
         elif query_string:
             signature = query_string
         request_context[SIGNATURE] = signature

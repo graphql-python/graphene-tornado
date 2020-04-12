@@ -4,16 +4,22 @@ by Apollo Server: https://github.com/apollographql/apollo-server/tree/master/pac
 
 Extensions are also middleware but have additional hooks.
 """
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
+from __future__ import print_function
 
-from abc import ABCMeta, abstractmethod
-from typing import NewType, List, Callable, Optional, Dict, Any
+from abc import ABCMeta
+from abc import abstractmethod
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
 
+from graphql import DocumentNode
 from graphql import GraphQLSchema
-from graphql.language.ast import Document
 from tornado.httputil import HTTPServerRequest
 
-EndHandler = NewType('EndHandler', Optional[List[Callable[[List[Exception]], None]]])
+EndHandler = Optional[List[Callable[[List[Exception]], None]]]
 
 
 class GraphQLExtension:
@@ -24,7 +30,7 @@ class GraphQLExtension:
     def request_started(self,
                         request: HTTPServerRequest,
                         query_string: Optional[str],
-                        parsed_query: Optional[Document],
+                        parsed_query: Optional[DocumentNode],
                         operation_name: Optional[str],
                         variables: Optional[Dict[str, Any]],
                         context: Any,
@@ -43,7 +49,7 @@ class GraphQLExtension:
     @abstractmethod
     def execution_started(self,
                           schema: GraphQLSchema,
-                          document: Document,
+                          document: DocumentNode,
                           root: Any,
                           context: Optional[Any],
                           variables: Optional[Any],

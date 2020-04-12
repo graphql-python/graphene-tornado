@@ -1,19 +1,24 @@
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
+from __future__ import print_function
 
 import hashlib
+from typing import cast
 
-from graphene import Schema
-from graphql import parse, execute, GraphQLError
-from graphql.utils.introspection_query import introspection_query
+from graphene.types.schema import introspection_query
+from graphql import execute
+from graphql import ExecutionResult
+from graphql import GraphQLError
+from graphql import GraphQLSchema
+from graphql import parse
 from json_stable_stringify_python import stringify
 
 
-def generate_schema_hash(schema: Schema) -> str:
+def generate_schema_hash(schema: GraphQLSchema) -> str:
     """
     Generates a stable hash of the current schema using an introspection query.
     """
     ast = parse(introspection_query)
-    result = execute(schema, ast)
+    result = cast(ExecutionResult, execute(schema, ast))
 
     if result and not result.data:
         raise GraphQLError('Unable to generate server introspection document')
