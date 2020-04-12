@@ -2,19 +2,35 @@ import inspect
 import json
 import sys
 import traceback
-from typing import List, Union, Callable, Any, Optional
+from asyncio import iscoroutinefunction
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
-import six
-from graphql import get_default_backend, execute, validate, GraphQLBackend
-from graphql.error import GraphQLError
+from graphene.types.schema import Schema
+from graphql import DocumentNode
+from graphql import execute
+from graphql import get_operation_ast
+from graphql import OperationType
+from graphql import parse
+from graphql import validate
 from graphql.error import format_error as format_graphql_error
-from graphql.execution import ExecutionResult
-from graphql.execution.executors.asyncio import AsyncioExecutor
+from graphql.error.graphql_error import GraphQLError
+from graphql.error.syntax_error import GraphQLSyntaxError
+from graphql.execution.execute import ExecutionResult
+from graphql.pyutils import is_awaitable
+from mypy_extensions import TypedDict
 from tornado import web
-from tornado.escape import json_encode, to_unicode
-from tornado.locks import Event
+from tornado.escape import json_encode
+from tornado.escape import to_unicode
+from tornado.httputil import HTTPServerRequest
 from tornado.log import app_log
 from tornado.web import HTTPError
+from typing_extensions import Awaitable
 from werkzeug.datastructures import MIMEAccept
 from werkzeug.http import parse_accept_header
 
@@ -35,34 +51,30 @@ class ExecutionError(Exception):
 
 class TornadoGraphQLHandler(web.RequestHandler):
 
-    executor = None
-    schema = None
-    batch = False
-    middleware = []
-    pretty = False
-    root_value = None
-    graphiql = False
-    graphiql_version = None
-    graphiql_template = None
-    graphiql_html_title = None
-    backend = None
-    document = None
-    graphql_params = None
-    parsed_body = None
+    schema: Schema
+    batch: bool = False
+    middleware: List[Any] = []
+    pretty: bool = False
+    root_value: Optional[Any] = None
+    graphiql: bool = False
+    graphiql_version: Optional[str] = None
+    graphiql_template: Optional[str] = None
+    graphiql_html_title: Optional[str] = None
+    document: Optional[DocumentNode]
+    graphql_params: Optional[Tuple[Any, Any, Any, Any]] = None
+    parsed_body: Optional[Dict[str, Any]] = None
     extension_stack = GraphQLExtensionStack([])
-    request_context = {}
+    request_context: Dict[str, Any] = {}
 
     def initialize(self,
-                   schema=None, 
-                   executor=None,
+                   schema: Optional[Schema]=None, 
                    middleware: Optional[Any] = None,
                    root_value: Any = None,
                    graphiql: bool = False,
                    pretty: bool = False,
                    batch: bool = False,
-                   backend: GraphQLBackend = None,
                    extensions: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]] = None
-                   ):
+                   ) -> None:
         super(TornadoGraphQLHandler, self).initialize()
 
         self.schema = schema
@@ -78,45 +90,40 @@ class TornadoGraphQLHandler(web.RequestHandler):
         if len(middlewares) > 0:
             self.middleware = middlewares
 
-        self.executor = executor
         self.root_value = root_value
         self.pretty = pretty
         self.graphiql = graphiql
         self.batch = batch
-        self.backend = backend or get_default_backend()
 
     @property
-    def context(self):
+    def context(self) -> HTTPServerRequest:
         return self.request
 
-    def get_root(self):
+    def get_root(self) -> Any:
         return self.root_value
 
-    def get_middleware(self):
+    def get_middleware(self) -> List[Callable]:
         return self.middleware
 
-    def get_backend(self):
-        return self.backend
-
-    def get_document(self):
+    def get_document(self) -> Optional[DocumentNode]:
         return self.document
 
     def get_parsed_body(self):
         return self.parsed_body
 
-    async def get(self):
+    async def get(self) -> None:
         try:
             await self.run('get')
         except Exception as ex:
             self.handle_error(ex)
 
-    async def post(self):
+    async def post(self) -> None:
         try:
             await self.run('post')
         except Exception as ex:
             self.handle_error(ex)
 
-    async def run(self, method):
+    async def run(self, method: str) -> None:
         show_graphiql = self.graphiql and self.should_display_graphiql()
 
         if show_graphiql:
@@ -152,7 +159,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.write(result)
         await self.finish()
 
-    def parse_body(self):
+    def parse_body(self) -> Any:
         content_type = self.content_type
 
         if content_type == 'application/graphql':
@@ -199,7 +206,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
                                                                  self.context, self.request_context)
 
         try:
-            execution_result = await self.execute_graphql_request(
+            execution_result, invalid = await self.execute_graphql_request(
                 method,
                 query,
                 variables,
@@ -211,11 +218,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
             if execution_result:
                 response = {}
 
-                if getattr(execution_result, 'is_pending', False):
-                    event = Event()
-                    on_resolve = lambda *_: event.set()  # noqa
-                    await execution_result.then(on_resolve).catch(on_resolve)
-                    await event.wait()
+                if is_awaitable(execution_result) or iscoroutinefunction(execution_result):
+                    execution_result = await execution_result
 
                 if hasattr(execution_result, 'get'):
                     execution_result = execution_result.get()
@@ -223,7 +227,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 if execution_result.errors:
                     response['errors'] = [self.format_error(e) for e in execution_result.errors]
 
-                if execution_result.invalid:
+                if invalid:
                     status_code = 400
                 else:
                     response['data'] = execution_result.data
@@ -242,48 +246,51 @@ class TornadoGraphQLHandler(web.RequestHandler):
         finally:
             await request_end()
 
-    async def execute_graphql_request(self, method, query, variables, operation_name, show_graphiql=False):
+    async def execute_graphql_request(self, method: str, query: Optional[str], variables: Optional[Dict[str, str]], operation_name: Optional[str], show_graphiql: bool = False) -> Tuple[Optional[Union[Awaitable[ExecutionResult], ExecutionResult]], Optional[bool]]:
         if not query:
             if show_graphiql:
-                return None
+                return None, None
             raise HTTPError(400, 'Must provide query string.')
 
         parsing_ended = await self.extension_stack.parsing_started(query)
         try:
-            backend = self.get_backend()
-            self.document = backend.document_from_string(self.schema, query)
+            self.document = parse(query)
             await parsing_ended()
-        except Exception as e:
+        except GraphQLError as e:
             await parsing_ended(e)
-            return ExecutionResult(errors=[e], invalid=True)
+            return ExecutionResult(errors=[e], data=None), True
 
         validation_ended = await self.extension_stack.validation_started()
         try:
-            validation_errors = validate(self.schema, self.document.document_ast)
-        except Exception as e:
+            validation_errors = validate(self.schema.graphql_schema, self.document)
+        except GraphQLError as e:
             await validation_ended([e])
-            return ExecutionResult(errors=[e], invalid=True)
+            return ExecutionResult(errors=[e], data=None), True
 
         if validation_errors:
-            validation_ended(validation_errors)
+            await validation_ended(validation_errors)
             return ExecutionResult(
                 errors=validation_errors,
-                invalid=True,
-            )
+                data=None,
+            ), True
         else:
             await validation_ended()
 
         if method.lower() == 'get':
-            operation_type = self.document.get_operation_type(operation_name)
-            if operation_type and operation_type != "query":
+            operation_node = get_operation_ast(self.document, operation_name)
+            if not operation_node:
                 if show_graphiql:
-                    return None
+                    return None, None
+                raise HTTPError(405, 'Must provide operation name if query contains multiple operations.')
 
+            if not operation_node.operation == OperationType.QUERY:
+                if show_graphiql:
+                    return None, None
                 raise HTTPError(405, 'Can only perform a {} operation from a POST request.'
-                                .format(operation_type))
+                                .format(operation_node.operation.value))
 
         execution_ended = await self.extension_stack.execution_started(
-            schema=self.schema,
+            schema=self.schema.graphql_schema,
             document=self.document,
             root=self.root_value,
             context=self.context,
@@ -293,32 +300,30 @@ class TornadoGraphQLHandler(web.RequestHandler):
         )
         try:
             result = await self.execute(
-                self.document.document_ast,
-                root=self.get_root(),
-                variables=variables,
+                self.document,
+                root_value=self.get_root(),
+                variable_values=variables,
                 operation_name=operation_name,
-                context=self.context,
+                context_value=self.context,
                 middleware=self.get_middleware(),
-                executor=self.executor or AsyncioExecutor(),
-                return_promise=True
             )
             await execution_ended()
-        except Exception as e:
+        except GraphQLError as e:
             await execution_ended([e])
-            return ExecutionResult(errors=[e], invalid=True)
+            return ExecutionResult(errors=[e], data=None), True
 
-        return result
+        return result, False
 
-    async def execute(self, *args, **kwargs):
-        return execute(self.schema, *args, **kwargs)
+    async def execute(self, *args, **kwargs) -> Union[Awaitable[ExecutionResult], ExecutionResult]:
+        return execute(self.schema.graphql_schema, *args, **kwargs)
 
-    def json_encode(self, d, pretty=False):
-        if pretty or self.get_query_argument('pretty', False):
+    def json_encode(self, d: Dict[str, Any], pretty: bool = False) -> str:
+        if pretty or self.get_query_argument('pretty', False):  # type: ignore
             return json.dumps(d, sort_keys=True, indent=2, separators=(',', ': '))
 
         return json.dumps(d, separators=(',', ':'))
 
-    def render_graphiql(self, query, variables, operation_name, result):
+    def render_graphiql(self, query: str, variables: str, operation_name: str, result: str) -> str:
         return render_graphiql(
             query=query,
             variables=variables,
@@ -329,18 +334,18 @@ class TornadoGraphQLHandler(web.RequestHandler):
             graphiql_html_title=self.graphiql_html_title,
         )
 
-    def should_display_graphiql(self):
+    def should_display_graphiql(self) -> bool:
         raw = 'raw' in self.request.query_arguments.keys() or 'raw' in self.request.arguments
         return not raw and self.request_wants_html()
 
-    def request_wants_html(self):
+    def request_wants_html(self) -> bool:
         accept_header = self.request.headers.get('Accept', '')
         accept_mimetypes = parse_accept_header(accept_header, MIMEAccept)
         best = accept_mimetypes.best_match(['application/json', 'text/html'])
         return best == 'text/html' and accept_mimetypes[best] > accept_mimetypes['application/json']
 
     @property
-    def content_type(self):
+    def content_type(self) -> str:
         return self.request.headers.get('Content-Type', 'text/plain').split(';')[0]
 
     @staticmethod
@@ -351,19 +356,19 @@ class TornadoGraphQLHandler(web.RequestHandler):
                 continue
             yield middleware
 
-    def get_graphql_params(self, request, data):
+    def get_graphql_params(self, request: HTTPServerRequest, data: Dict[str, Any]) -> Any:
         if self.graphql_params:
             return self.graphql_params
 
         single_args = {}
         for key in request.arguments.keys():
-            single_args[key] = self.decode_argument(request.arguments.get(key)[0])
+            single_args[key] = self.decode_argument(request.arguments.get(key)[0])  # type: ignore
 
         query = single_args.get('query') or data.get('query')
         variables = single_args.get('variables') or data.get('variables')
         id = single_args.get('id') or data.get('id')
 
-        if variables and isinstance(variables, six.string_types):
+        if variables and isinstance(variables, str):
             try:
                 variables = json.loads(variables)
             except:  # noqa
@@ -376,7 +381,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.graphql_params = query, variables, operation_name, id
         return self.graphql_params
 
-    def handle_error(self, ex):
+    def handle_error(self, ex: Exception) -> None:
         if not isinstance(ex, (web.HTTPError, ExecutionError, GraphQLError)):
             tb = ''.join(traceback.format_exception(*sys.exc_info()))
             app_log.error('Error: {0} {1}'.format(ex, tb))
@@ -386,7 +391,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
         self.write(error_json)
 
     @staticmethod
-    def error_status(exception):
+    def error_status(exception: Exception) -> int:
         if isinstance(exception, web.HTTPError):
             return exception.status_code
         elif isinstance(exception, (ExecutionError, GraphQLError)):
@@ -395,7 +400,7 @@ class TornadoGraphQLHandler(web.RequestHandler):
             return 500
 
     @staticmethod
-    def error_format(exception):
+    def error_format(exception: Exception) -> List[Dict[str, Any]]:
         if isinstance(exception, ExecutionError):
             return [{'message': e} for e in exception.errors]
         elif isinstance(exception, GraphQLError):
@@ -406,8 +411,8 @@ class TornadoGraphQLHandler(web.RequestHandler):
             return [{'message': 'Unknown server error'}]
 
     @staticmethod
-    def format_error(error):
+    def format_error(error: Union[GraphQLError, GraphQLSyntaxError]) -> Dict[str, Any]:
         if isinstance(error, GraphQLError):
             return format_graphql_error(error)
 
-        return {'message': six.text_type(error)}
+        return {'message': str(error)}

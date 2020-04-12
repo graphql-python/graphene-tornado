@@ -1,21 +1,21 @@
-from __future__ import absolute_import, print_function
-
 import gzip
 import logging
 import os
 import socket
 import sys
-from typing import NamedTuple, Optional, Callable
+from typing import Callable
+from typing import NamedTuple
+from typing import Optional
 
-import six
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
-from six import StringIO, BytesIO
+from six import BytesIO
 from tornado.httpclient import AsyncHTTPClient
 from tornado_retry_client import RetryClient
 
 from graphene_tornado.apollo_tooling.operation_id import default_engine_reporting_signature
-from .reports_pb2 import ReportHeader, FullTracesReport
+from .reports_pb2 import FullTracesReport
+from .reports_pb2 import ReportHeader
 
 LOGGER = logging.getLogger(__name__)
 
@@ -51,21 +51,21 @@ EngineReportingOptions = NamedTuple('EngineReportingOptions', [
     ('schema_tag', Optional[str]),
     ('generate_client_info', Optional[GenerateClientInfo])
 ])
-EngineReportingOptions.__new__.__defaults__ = (None,) * len(EngineReportingOptions._fields)
+EngineReportingOptions.__new__.__defaults__ = (None,) * len(EngineReportingOptions._fields)  # type: ignore
 
 
 def _serialize(message: Message) -> bytes:
-    out = BytesIO() if six.PY3 else StringIO()
+    out = BytesIO()
     with gzip.GzipFile(fileobj=out, mode="w") as f:
         f.write(message.SerializeToString())
     return out.getvalue()
 
 
-def _get_trace_signature(operation_name, document_ast, query_string):
-    if not document_ast:
+def _get_trace_signature(operation_name, document, query_string):
+    if not document:
         return query_string
     else:
-        return default_engine_reporting_signature(document_ast, operation_name)
+        return default_engine_reporting_signature(document, operation_name)
 
 
 class EngineReportingAgent:
@@ -101,13 +101,13 @@ class EngineReportingAgent:
     def _options(self) -> EngineReportingOptions:
         return self.options
 
-    async def add_trace(self, operation_name, document_ast, query_string, trace):
+    async def add_trace(self, operation_name, document, query_string, trace):
         operation_name = operation_name or '-'
 
         if self._stopped:
             return
 
-        signature = _get_trace_signature(operation_name, document_ast, query_string)
+        signature = _get_trace_signature(operation_name, document, query_string)
         stats_report_key = "# " + operation_name + '\n' + signature
         traces_per_query = self.report.traces_per_query.get(stats_report_key, None)
         if not traces_per_query:

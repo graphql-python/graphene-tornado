@@ -1,7 +1,6 @@
 import re
 
 import pytest
-import six
 import tornado
 from google.protobuf.json_format import MessageToJson
 from graphql import parse
@@ -10,79 +9,10 @@ from graphene_tornado.ext.apollo_engine_reporting.engine_agent import EngineRepo
 from graphene_tornado.ext.apollo_engine_reporting.engine_extension import EngineReportingExtension
 from graphene_tornado.ext.apollo_engine_reporting.tests.schema import schema
 from graphene_tornado.tests.http_helper import HttpHelper
-from graphene_tornado.tests.test_graphql import GRAPHQL_HEADER, url_string, response_json
+from graphene_tornado.tests.test_graphql import GRAPHQL_HEADER
+from graphene_tornado.tests.test_graphql import response_json
+from graphene_tornado.tests.test_graphql import url_string
 from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
-
-expected = """{
-  "durationNs": "-1", 
-  "endTime": "2019-09-21T19:37:09.908919Z", 
-  "http": {
-    "method": "GET"
-  }, 
-  "root": {
-    "child": [
-      {
-        "child": [
-          {
-            "endTime": "-1", 
-            "parentType": "User", 
-            "responseName": "name", 
-            "startTime": "-1", 
-            "type": "String"
-          }, 
-          {
-            "child": [
-              {
-                "child": [
-                  {
-                    "endTime": "-1", 
-                    "parentType": "Post", 
-                    "responseName": "id", 
-                    "startTime": "-1", 
-                    "type": "Int"
-                  }
-                ], 
-                "index": 0
-              }, 
-              {
-                "child": [
-                  {
-                    "endTime": "-1", 
-                    "parentType": "Post", 
-                    "responseName": "id", 
-                    "startTime": "-1", 
-                    "type": "Int"
-                  }
-                ], 
-                "index": 1
-              }
-            ], 
-            "endTime": "-1", 
-            "parentType": "User", 
-            "responseName": "posts", 
-            "startTime": "-1", 
-            "type": "[Post]"
-          }
-        ], 
-        "endTime": "-1", 
-        "parentType": "Query", 
-        "responseName": "author", 
-        "startTime": "-1", 
-        "type": "User"
-      }, 
-      {
-        "endTime": "-1", 
-        "parentType": "Query", 
-        "responseName": "aBoolean", 
-        "startTime": "-1", 
-        "type": "Boolean"
-      }
-    ], 
-    "endTime": "-1", 
-    "startTime": "-1"
-  }, 
-  "startTime": "2019-09-21T19:37:09.908919Z"
-}"""
 
 
 QUERY = """
@@ -129,7 +59,7 @@ def http_helper(http_client, base_url):
 
 
 @pytest.mark.gen_test()
-def test_can_send_report_to_engine(http_helper):
+def test_can_send_report_to_engine(http_helper, snapshot):
     response = yield http_helper.get(url_string(query=QUERY), headers=GRAPHQL_HEADER)
     assert response.code == 200
     assert 'data' in response_json(response)
@@ -147,7 +77,4 @@ def test_can_send_report_to_engine(http_helper):
                         '"2019-09-21T19:37:09.908919Z"',
                         trace_json)
 
-    e = expected
-    if six.PY3:
-        e = re.sub(r'\s+\n', '\n', expected)
-    assert e == trace_json
+    snapshot.assert_match(trace_json)

@@ -3,9 +3,15 @@ from __future__ import absolute_import, print_function
 import json
 import time
 from numbers import Number
+from typing import Any
 from typing import Callable, NamedTuple
+from typing import cast
+from typing import List
+from typing import Optional
+from typing import Union
 
 from google.protobuf.timestamp_pb2 import Timestamp
+from graphql.pyutils import Path
 from tornado.httputil import HTTPServerRequest
 
 from graphene_tornado.ext.apollo_engine_reporting.engine_agent import EngineReportingOptions
@@ -32,13 +38,13 @@ def generate_client_info(request: HTTPServerRequest) -> ClientInfo:
     )
 
 
-def response_path_as_string(path):
-    if not path:
+def response_path_as_string(path: Optional[List[Union[str, int]]]) -> str:
+    if not path or len(path) == 0:
         return ''
-    return '.'.join((str(x) for x in path))
+    return '.'.join([str(p) for p in path])
 
 
-def now_ns():
+def now_ns() -> int:
     return time.time_ns()
 
 
@@ -59,7 +65,7 @@ class EngineReportingExtension(GraphQLExtension):
         self.trace = Trace(root=root)
         self.nodes = {response_path_as_string(None): root}
         self.generate_client_info = options.generate_client_info or generate_client_info
-        self.resolver_stats = list()
+        self.resolver_stats: List[Any] = list()
 
     async def request_started(self, request, query_string, parsed_query, operation_name, variables, context, request_context):
         self.trace.start_time.GetCurrentTime()
@@ -82,9 +88,7 @@ class EngineReportingExtension(GraphQLExtension):
 
             op_name = self.operation_name or ''
             self.trace.root.MergeFrom(self.nodes.get(''))
-            document = request_context.get('document', None)
-            document_ast = document.document_ast if document else None
-            await self.add_trace(op_name, document_ast, self.query_string, self.trace)
+            await self.add_trace(op_name, request_context.get('document', None), self.query_string, self.trace)
 
         return on_request_ended
 
@@ -143,27 +147,28 @@ class EngineReportingExtension(GraphQLExtension):
         except:
             return Trace.HTTP.UNKNOWN
 
-    def _new_node(self, path):
+    def _new_node(self, path: Path):
         node = Trace.Node()
 
-        id = path[-1]
-        if isinstance(id, Number):
+        path_list = path.as_list()
+
+        id = path_list[-1]
+        if isinstance(id, int):
             node.index = id
         else:
-            node.response_name = id
+            node.response_name = cast(str, id)
 
-        self.nodes[response_path_as_string(path)] = node
+        self.nodes[response_path_as_string(path_list)] = node
         parent_node = self._ensure_parent_node(path)
         n = parent_node.child.add()
         n.MergeFrom(node)
-        self.nodes[response_path_as_string(path)] = n
+        self.nodes[response_path_as_string(path_list)] = n
         return n
 
-    def _ensure_parent_node(self, path):
-        prev = [''] if len(path) == 1 else path[:-1]
-        parent_path = response_path_as_string(prev)
+    def _ensure_parent_node(self, path: Path):
+        parent_path = response_path_as_string(path.prev)
         parent_node = self.nodes.get(parent_path, None)
         if parent_node:
             return parent_node
-        return self._new_node(prev)
+        return self._new_node(path.prev)
 

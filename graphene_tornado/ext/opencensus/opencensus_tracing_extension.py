@@ -82,7 +82,7 @@ class OpenCensusExtension(GraphQLExtension):
         # If we wanted to be fancy, we could build up a tree like the ApolloEngineExtension does so that the
         # whole tree appears as nested spans. However, this is a bit tricky to do with the current OpenCensus
         # API because when you request a span, a bunch of context variables are set. This keeps it simple for now.
-        tracer.start_span('.'.join(str(x) for x in info.path))
+        tracer.start_span('.'.join(info.path.as_list()))
 
         async def on_end(errors=None, result=None):
             tracer.end_span()

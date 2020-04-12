@@ -59,19 +59,6 @@ def test_graphiql_renders_pretty(http_helper):
 
 
 @pytest.mark.gen_test
-def test_graphiql_renders_pretty(http_helper):
-    response = yield http_helper.get('/graphql?query={test}', headers={'Accept': 'text/html'})
-    pretty_response = (
-        '{\n'
-        '  "data": {\n'
-        '    "test": "Hello World"\n'
-        '  }\n'
-        '}'
-    ).replace("\"", "\\\"").replace("\n", "\\n")
-    assert pretty_response in to_unicode(response.body)
-
-
-@pytest.mark.gen_test
 def test_handles_empty_vars(http_helper):
     response = yield http_helper.post_json('/graphql', headers={'Accept': 'text/html'}, post_data=dict(
         query="",

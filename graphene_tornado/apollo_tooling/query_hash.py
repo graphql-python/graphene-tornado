@@ -1,7 +1,7 @@
 import hashlib
 
 
-def compute(query):
+def compute(query: str) -> str:
     # type (str) -> str
     """
     Computes the query hash via SHA-256.

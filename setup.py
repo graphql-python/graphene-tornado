@@ -35,12 +35,13 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
@@ -50,13 +51,14 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
-        'graphene>=2.1,<3',
+        'graphene>3.0b1',
         'Jinja2>=2.10.1',
         'tornado>=5.1.0',
         'werkzeug==0.12.2'
     ],
     setup_requires=[
         'pytest',
+        'snapshottest'
     ],
     tests_require=tests_require,
     extras_require={

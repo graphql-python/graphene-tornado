@@ -4,16 +4,26 @@ Ported from https://github.com/apollographql/apollo-tooling/blob/master/packages
 import re
 
 import six
+from graphql import DirectiveNode
+from graphql import DocumentNode
+from graphql import FieldNode
+from graphql import FloatValueNode
+from graphql import FragmentDefinitionNode
+from graphql import FragmentSpreadNode
+from graphql import InlineFragmentNode
+from graphql import IntValueNode
+from graphql import ListValueNode
+from graphql import ObjectValueNode
+from graphql import OperationDefinitionNode
 
 from graphql import print_ast
-from graphql.language.ast import Document, IntValue, FloatValue, StringValue, ListValue, ObjectValue, Field, \
-    Directive, FragmentDefinition, InlineFragment, FragmentSpread, SelectionSet, OperationDefinition
+from graphql import SelectionSetNode
+from graphql import separate_operations
+from graphql import StringValueNode
 from graphql.language.visitor import Visitor, visit
 
-from graphene_tornado.apollo_tooling.seperate_operations import separate_operations
 
-
-def hide_literals(ast: Document) -> Document:
+def hide_literals(ast: DocumentNode) -> DocumentNode:
     """
     Replace numeric, string, list, and object literals with "empty"
     values. Leaves enums alone (since there's no consistent "zero" enum). This
@@ -26,7 +36,7 @@ def hide_literals(ast: Document) -> Document:
     return ast
 
 
-def hide_string_and_numeric_literals(ast: Document) -> Document:
+def hide_string_and_numeric_literals(ast: DocumentNode) -> DocumentNode:
     """
     In the same spirit as the similarly named `hideLiterals` function, only
     hide string and numeric literals.
@@ -35,7 +45,7 @@ def hide_string_and_numeric_literals(ast: Document) -> Document:
     return ast
 
 
-def drop_unused_definitions(ast: Document, operation_name: str) -> Document:
+def drop_unused_definitions(ast: DocumentNode, operation_name: str) -> DocumentNode:
     """
     A GraphQL query may contain multiple named operations, with the operation to
     use specified separately by the client. This transformation drops unused
@@ -49,7 +59,7 @@ def drop_unused_definitions(ast: Document, operation_name: str) -> Document:
     return separated
 
 
-def sort_ast(ast: Document) -> Document:
+def sort_ast(ast: DocumentNode) -> DocumentNode:
     """
     sortAST sorts most multi-child nodes alphabetically. Using this as part of
     your signature calculation function may make it easier to tell the difference
@@ -61,7 +71,7 @@ def sort_ast(ast: Document) -> Document:
     return ast
 
 
-def remove_aliases(ast: Document) -> Document:
+def remove_aliases(ast: DocumentNode) -> DocumentNode:
     """
     removeAliases gets rid of GraphQL aliases, a feature by which you can tell a
     server to return a field's data under a different name from the field
@@ -72,7 +82,7 @@ def remove_aliases(ast: Document) -> Document:
     return ast
 
 
-def print_with_reduced_whitespace(ast: Document) -> str:
+def print_with_reduced_whitespace(ast: DocumentNode) -> str:
     """
     Like the graphql-js print function, but deleting whitespace wherever
     feasible. Specifically, all whitespace (outside of string literals) is
@@ -115,15 +125,15 @@ class _HideLiteralsVisitor(Visitor):
         self._only_string_and_numeric = only_string_and_numeric
 
     def enter(self, node, key, parent, path, ancestors):
-        if isinstance(node, IntValue):
+        if isinstance(node, IntValueNode):
             node.value = 0
-        elif isinstance(node, FloatValue):
+        elif isinstance(node, FloatValueNode):
             node.value = 0
-        elif isinstance(node, StringValue):
+        elif isinstance(node, StringValueNode):
             node.value = ""
-        elif not self._only_string_and_numeric and isinstance(node, ListValue):
+        elif not self._only_string_and_numeric and isinstance(node, ListValueNode):
             node.values = []
-        elif not self._only_string_and_numeric and isinstance(node, ObjectValue):
+        elif not self._only_string_and_numeric and isinstance(node, ObjectValueNode):
             node.fields = []
         return node
 
@@ -135,7 +145,7 @@ _HIDE_ONLY_STRING_AND_NUMERIC_LITERALS_VISITOR = _HideLiteralsVisitor(only_strin
 class _RemoveAliasesVisitor(Visitor):
 
     def enter(self, node, key, parent, path, ancestors):
-        if isinstance(node, Field):
+        if isinstance(node, FieldNode):
            node.alias = None
         return node
 
@@ -146,7 +156,7 @@ _REMOVE_ALIAS_VISITOR = _RemoveAliasesVisitor()
 class _HexConversionVisitor(Visitor):
 
     def enter(self, node, key, parent, path, ancestors):
-        if isinstance(node, StringValue) and node.value is not None:
+        if isinstance(node, StringValueNode) and node.value is not None:
             if six.PY3:
                 encoded = node.value.encode('utf-8').hex()
             else:
@@ -161,26 +171,26 @@ _HEX_CONVERSION_VISITOR = _HexConversionVisitor()
 class _SortingVisitor(Visitor):
 
     def enter(self, node, key, parent, path, ancestors):
-        if isinstance(node, Document):
+        if isinstance(node, DocumentNode):
             node.definitions = _sorted(node.definitions, lambda x: (x.__class__.__name__, self._by_name(x)))
-        elif isinstance(node, OperationDefinition):
+        elif isinstance(node, OperationDefinitionNode):
             node.variable_definitions = _sorted(node.variable_definitions, self._by_variable_name)
-        elif isinstance(node, SelectionSet):
+        elif isinstance(node, SelectionSetNode):
             node.selections = _sorted(node.selections, lambda x: (x.__class__.__name__, self._by_name(x)))
-        elif isinstance(node, Field):
+        elif isinstance(node, FieldNode):
             node.arguments = _sorted(node.arguments, self._by_name)
-        elif isinstance(node, FragmentSpread):
+        elif isinstance(node, FragmentSpreadNode):
             node.directives = _sorted(node.directives, self._by_name)
-        elif isinstance(node, InlineFragment):
+        elif isinstance(node, InlineFragmentNode):
             node.directives = _sorted(node.directives, self._by_type_definition)
-        elif isinstance(node, FragmentDefinition):
+        elif isinstance(node, FragmentDefinitionNode):
             node.directives = _sorted(node.directives, self._by_name)
-        elif isinstance(node, Directive):
+        elif isinstance(node, DirectiveNode):
             node.arguments = _sorted(node.arguments, self._by_name)
         return node
 
     def _by_name(self, node):
-        if isinstance(node, InlineFragment):
+        if isinstance(node, InlineFragmentNode):
             return self._by_type_definition(node)
         elif node.name is not None:
             return node.name.value

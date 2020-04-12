@@ -2,7 +2,7 @@ from typing import Optional, Any, List, Union, Callable
 
 import pytest
 import tornado
-from graphql import parse, GraphQLBackend
+from graphql import parse
 from opencensus.trace import tracer as tracer_module, execution_context
 from opencensus.trace.base_exporter import Exporter
 from opencensus.trace.propagation.google_cloud_format import GoogleCloudFormatPropagator
@@ -20,11 +20,11 @@ from graphene_tornado.tornado_graphql_handler import TornadoGraphQLHandler
 
 class GQLHandler(TornadoGraphQLHandler):
 
-    def initialize(self, schema=None, executor=None, middleware: Optional[Any] = None, root_value: Any = None,
-                   graphiql: bool = False, pretty: bool = False, batch: bool = False, backend: GraphQLBackend = None,
+    def initialize(self, schema=None, middleware: Optional[Any] = None, root_value: Any = None,
+                   graphiql: bool = False, pretty: bool = False, batch: bool = False,
                    extensions: List[Union[Callable[[], GraphQLExtension], GraphQLExtension]] = None,
                    exporter=None):
-        super().initialize(schema, executor, middleware, root_value, graphiql, pretty, batch, backend, extensions)
+        super().initialize(schema, middleware, root_value, graphiql, pretty, batch, extensions)
         execution_context.set_opencensus_tracer(tracer_module.Tracer(
                 sampler=AlwaysOnSampler(),
                 exporter=exporter,
