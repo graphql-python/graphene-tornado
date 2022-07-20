@@ -5,4 +5,4 @@ mypy==0.770
 pre-commit==2.2.0
 pytest==4.4.1
 pytest-cov==2.6.1
-pytest-tornado==0.8.0
+pytest-tornado==0.8.1
