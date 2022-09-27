@@ -18,12 +18,11 @@ from graphql import get_operation_ast
 from graphql import OperationType
 from graphql import parse
 from graphql import validate
-from graphql.error import format_error as format_graphql_error
+from graphql.error import GraphQLFormattedError  as format_graphql_error
 from graphql.error.graphql_error import GraphQLError
 from graphql.error.syntax_error import GraphQLSyntaxError
 from graphql.execution.execute import ExecutionResult
 from graphql.pyutils import is_awaitable
-from mypy_extensions import TypedDict
 from tornado import web
 from tornado.escape import json_encode
 from tornado.escape import to_unicode

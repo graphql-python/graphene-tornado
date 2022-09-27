@@ -13,7 +13,7 @@ tests_require = [
     'mock',
     'pytest>=4.4.1',
     'pytest-cov>=2.6.1',
-    'pytest-tornado>=0.7.0',
+    'pytest-tornado>=0.8.1',
     'tox'
 ]
 
@@ -32,17 +32,14 @@ setup(
     license='MIT',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 3 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10'
     ],
 
     keywords='api graphql protocol rest relay graphene',
@@ -51,10 +48,11 @@ setup(
 
     install_requires=[
         'six>=1.10.0',
-        'graphene>=3.0b1',
+        'graphene>=3.0',
         'Jinja2>=2.10.1',
-        'tornado>=5.1.0',
-        'werkzeug==0.12.2'
+        'tornado>=6.1.0, <7.0',
+        'werkzeug',
+        'typing_extensions'
     ],
     setup_requires=[
         'pytest',
